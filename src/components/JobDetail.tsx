@@ -1,71 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useJobs } from '../hooks/useJobs';
 import Loading from './Loading';
 
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { getJobDetail, isDataLoaded } = useJobs();
-  
-  // State untuk data job
   const [job, setJob] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   
-  // Ambil data job dari state navigation (jika ada)
-  const jobFromState = location.state?.job;
-  
-
   useEffect(() => {
-    const loadJobData = async () => {
-      setLoading(true);
-      
-      // Priority 1: Gunakan data dari state (jika ada) - instant
-      if (jobFromState) {
-        setJob(jobFromState);
-        setLoading(false);
-        return;
-      }
-      
-      // Priority 2: Jika data sudah loaded di hook, ambil dari there
-      if (id && isDataLoaded()) {
-        const jobData = getJobDetail(id);
-        if (jobData) {
-          setJob(jobData);
-          setLoading(false);
-          return;
-        }
-      }
-      
-      // Priority 3: Jika data belum tersedia, tunggu sebentar
-      if (id) {
-        const checkInterval = setInterval(() => {
-          if (isDataLoaded()) {
-            const jobData = getJobDetail(id);
-            if (jobData) {
-              setJob(jobData);
-              setLoading(false);
-              clearInterval(checkInterval);
-            }
-          }
-        }, 100);
+    if (id && isDataLoaded()) {
+      const jobData = getJobDetail(id);
+      setJob(jobData);
+    }
+  }, [id, getJobDetail, isDataLoaded]);
 
-        // Timeout setelah 3 detik
-        const timeout = setTimeout(() => {
-          clearInterval(checkInterval);
-          setLoading(false);
-        }, 3000);
+  // Jika data belum loaded, tampilkan loading
+  if (!isDataLoaded()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loading message="Memuat data lowongan..." />
+      </div>
+    );
+  }
 
-        return () => {
-          clearInterval(checkInterval);
-          clearTimeout(timeout);
-        };
-      }
-    };
-
-    loadJobData();
-  }, [id, jobFromState, getJobDetail, isDataLoaded]);
+  // Jika job tidak ditemukan setelah data loaded
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="text-6xl mb-4">😕</div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Lowongan Tidak Ditemukan</h1>
+          <p className="text-gray-600 mb-6">Lowongan yang Anda cari tidak ditemukan atau sudah tidak tersedia.</p>
+          <button 
+            onClick={() => navigate('/')}
+            className="btn-primary"
+          >
+            Kembali ke Beranda
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
@@ -99,44 +76,6 @@ const JobDetail = () => {
       window.open(`https://maganghub.kemnaker.go.id/lowongan/view/${id}`, '_blank');
     }
   };
-
-  // Tampilkan loading
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loading message="Memuat detail lowongan..." />
-      </div>
-    );
-  }
-
-  // Tampilkan error jika job tidak ditemukan
-  if (!job) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Lowongan Tidak Ditemukan</h1>
-          <p className="text-gray-600 mb-6">
-            Lowongan yang Anda cari tidak ditemukan atau sudah tidak tersedia.
-          </p>
-          <div className="space-y-3">
-            <button 
-              onClick={() => router.back()}
-              className="w-full btn-primary"
-            >
-              Kembali ke Beranda
-            </button>
-            <button 
-              onClick={() => window.location.reload()}
-              className="w-full btn-secondary"
-            >
-              🔄 Coba Lagi
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const programStudi = parseJSON(job.program_studi);
   const jenjang = parseJSON(job.jenjang);

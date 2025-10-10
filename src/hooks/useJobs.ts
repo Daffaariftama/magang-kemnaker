@@ -7,11 +7,6 @@ interface ProgramStudi {
   title: string;
 }
 
-interface Jenjang {
-  value: string;
-  title: string;
-}
-
 interface Perusahaan {
   id_perusahaan: string;
   nama_perusahaan: string;
@@ -77,7 +72,7 @@ export const useJobs = () => {
   const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(21);

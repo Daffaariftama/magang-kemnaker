@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface JobCardProps {
   job: any;
 }
 
-const JobCard = ({ job }: JobCardProps) => {
+const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const [showProgramStudiModal, setShowProgramStudiModal] = useState(false);
   const navigate = useNavigate();
 
@@ -23,7 +23,6 @@ const JobCard = ({ job }: JobCardProps) => {
   };
 
   const programStudi = parseJSON(job.program_studi);
-  const jenjang = parseJSON(job.jenjang);
 
   // Hitung durasi magang (selalu bulatkan ke atas)
   const calculateDuration = () => {
@@ -40,10 +39,7 @@ const JobCard = ({ job }: JobCardProps) => {
   const remainingCount = programStudi.length - 2;
 
   const handleCardClick = () => {
-    // Navigate dengan membawa data job di state
-    navigate(`/lowongan/${job.id_posisi}`, { 
-      state: { job } 
-    });
+    navigate(`/lowongan/${job.id_posisi}`);
   };
 
   const ProgramStudiModal = () => (

@@ -1,9 +1,12 @@
-import React from 'react';
+interface LoadingProps {
+  message?: string;
+}
 
-const Loading = () => {
+const Loading: React.FC<LoadingProps> = ({ message = "Memuat..." }) => {
   return (
-    <div className="flex justify-center items-center py-8">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div className="flex flex-col justify-center items-center py-12">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+      <p className="text-gray-600">{message}</p>
     </div>
   );
 };
