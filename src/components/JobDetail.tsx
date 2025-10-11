@@ -16,7 +16,6 @@ const JobDetail = () => {
     }
   }, [id, getJobDetail, isDataLoaded]);
 
-  // Jika data belum loaded, tampilkan loading
   if (!isDataLoaded()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -25,17 +24,16 @@ const JobDetail = () => {
     );
   }
 
-  // Jika job tidak ditemukan setelah data loaded
   if (!job) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md w-full p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
           <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Lowongan Tidak Ditemukan</h1>
-          <p className="text-gray-600 mb-6">Lowongan yang Anda cari tidak ditemukan atau sudah tidak tersedia.</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-3">Lowongan Tidak Ditemukan</h1>
+          <p className="text-gray-600 mb-6 text-sm">Lowongan yang Anda cari tidak ditemukan atau sudah tidak tersedia.</p>
           <button 
             onClick={() => navigate('/')}
-            className="btn-primary"
+            className="w-full bg-gradient-to-r from-primary-900 to-purple-900 text-white py-3 px-4 rounded-xl font-semibold hover:from-primary-800 hover:to-purple-800 transition-all duration-200"
           >
             Kembali ke Beranda
           </button>
@@ -47,10 +45,9 @@ const JobDetail = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('id-ID', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
     });
   };
 
@@ -83,205 +80,168 @@ const JobDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-6">
+      {/* Floating Back Button */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center text-primary-900 hover:text-primary-800 mb-4 transition-colors"
+            className="flex items-center text-gray-700 hover:text-primary-900 transition-colors font-medium"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Kembali ke Beranda
+            Kembali
           </button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="card overflow-hidden">
-              {/* Header Card */}
-              <div className="bg-primary-900 p-6 text-white">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex-1">
-                    <h1 className="text-2xl font-bold mb-3">{job.posisi}</h1>
-                    <div className="flex items-center text-primary-100 text-lg mb-2">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                      {job.perusahaan.nama_perusahaan}
-                    </div>
-                    <div className="flex items-center text-primary-100 text-sm">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      </svg>
-                      {job.perusahaan.nama_kabupaten}, {job.perusahaan.nama_provinsi}
-                    </div>
-                  </div>
-                  {job.perusahaan.logo && (
-                    <img 
-                      src={job.perusahaan.logo} 
-                      alt={`Logo ${job.perusahaan.nama_perusahaan}`}
-                      className="w-16 h-16 object-contain bg-white rounded p-2 mt-4 lg:mt-0"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  )}
-                </div>
+      <div className="container mx-auto px-4 py-4">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-primary-900 to-purple-900 rounded-2xl p-5 text-white mb-4 shadow-lg">
+          <div className="flex items-start space-x-4">
+            {job.perusahaan.logo && (
+              <img 
+                src={job.perusahaan.logo} 
+                alt={`Logo ${job.perusahaan.nama_perusahaan}`}
+                className="w-14 h-14 object-contain bg-white rounded-xl p-2 flex-shrink-0"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold mb-2 leading-tight">{job.posisi}</h1>
+              <div className="flex items-center text-white/90 text-sm mb-1">
+                <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span className="truncate">{job.perusahaan.nama_perusahaan}</span>
               </div>
-
-              {/* Content */}
-              <div className="p-6">
-                {/* Info Utama */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-primary-50 rounded-lg p-4 border border-primary-200">
-                    <h3 className="font-semibold text-primary-900 mb-2 flex items-center">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Durasi Magang
-                    </h3>
-                    <p className="text-xl font-bold text-primary-900">{duration} Bulan</p>
-                  </div>
-                  
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                    <h3 className="font-semibold text-green-900 mb-2 flex items-center">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Status
-                    </h3>
-                    <p className="text-xl font-bold text-green-900">{job.ref_status_posisi.nama_status_posisi}</p>
-                  </div>
-                </div>
-
-                {/* Deskripsi Pekerjaan */}
-                {job.deskripsi_posisi && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Deskripsi Pekerjaan</h2>
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="prose max-w-none text-gray-700">
-                        {job.deskripsi_posisi.split('\n').map((paragraph: string, index: number) => (
-                          <p key={index} className="mb-3 leading-relaxed">
-                            {paragraph}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Program Studi */}
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Program Studi yang Dibutuhkan</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {programStudi.map((ps: any, index: number) => (
-                      <div key={index} className="flex items-center bg-primary-50 rounded p-3 border border-primary-200">
-                        <svg className="w-4 h-4 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-primary-800 font-medium">{ps.title}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Jenjang Pendidikan */}
-                {jenjang.length > 0 && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Jenjang Pendidikan</h2>
-                    <div className="flex flex-wrap gap-2">
-                      {jenjang.map((j: any, index: number) => (
-                        <span key={index} className="bg-gray-100 text-gray-700 px-3 py-2 rounded font-medium border border-gray-300">
-                          {j.title}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <div className="flex items-center text-white/80 text-xs">
+                <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                <span className="truncate">{job.perusahaan.nama_kabupaten}, {job.perusahaan.nama_provinsi}</span>
               </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="card p-6 sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pendaftaran</h3>
-              
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start text-gray-600">
-                  <svg className="w-5 h-5 text-gray-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium text-gray-900">Lokasi</p>
-                    <p className="text-sm">{job.perusahaan.alamat}</p>
-                    <p className="text-sm">{job.perusahaan.nama_kabupaten}, {job.perusahaan.nama_provinsi}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium text-gray-900">Tanggal Mulai</p>
-                    <p className="text-sm">{formatDate(job.jadwal.tanggal_mulai)}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium text-gray-900">Tanggal Selesai</p>
-                    <p className="text-sm">{formatDate(job.jadwal.tanggal_selesai)}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium text-gray-900">Batas Pendaftaran</p>
-                    <p className="text-sm text-red-600 font-semibold">{formatDate(job.jadwal.tanggal_batas_pendaftaran)}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-gray-600 pt-2 border-t border-gray-200">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <div>
-                      <p className="font-medium text-gray-900">Kuota</p>
-                      <p className="text-sm">{job.jumlah_kuota} posisi</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900">Pendaftar</p>
-                    <p className="text-sm text-green-600 font-semibold">{job.jumlah_terdaftar} orang</p>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={handleDaftar}
-                className="w-full btn-primary py-3 text-lg"
-              >
-                📝 Daftar Sekarang
-              </button>
-
-              <p className="text-xs text-gray-500 text-center mt-3">
-                Anda akan diarahkan ke halaman resmi MagangHub Kemnaker
-              </p>
             </div>
           </div>
         </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-center text-gray-600 text-sm mb-1">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Durasi
+            </div>
+            <p className="text-lg font-bold text-primary-900">{duration} Bulan</p>
+          </div>
+          
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-center text-gray-600 text-sm mb-1">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Status
+            </div>
+            <p className="text-lg font-bold text-green-600">{job.ref_status_posisi.nama_status_posisi}</p>
+          </div>
+        </div>
+
+        {/* Timeline Info */}
+        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-3 flex items-center">
+            <svg className="w-5 h-5 text-primary-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Timeline Magang
+          </h3>
+          
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600 text-sm">Mulai</span>
+              <span className="font-semibold text-gray-900 text-sm">{formatDate(job.jadwal.tanggal_mulai)}</span>
+            </div>
+            
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600 text-sm">Selesai</span>
+              <span className="font-semibold text-gray-900 text-sm">{formatDate(job.jadwal.tanggal_selesai)}</span>
+            </div>
+            
+            <div className="flex justify-between items-center py-2">
+              <span className="text-gray-600 text-sm">Batas Daftar</span>
+              <span className="font-semibold text-red-600 text-sm">{formatDate(job.jadwal.tanggal_batas_pendaftaran)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Program Studi */}
+        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-3 flex items-center">
+            <svg className="w-5 h-5 text-primary-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            Program Studi ({programStudi.length})
+          </h3>
+          
+          <div className="flex flex-wrap gap-2">
+            {programStudi.map((ps: any, index: number) => (
+              <span 
+                key={index} 
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-800 text-xs px-3 py-2 rounded-lg border border-blue-200 font-medium whitespace-nowrap"
+              >
+                {ps.title}
+              </span>
+            ))}
+        
+          </div>
+        </div>
+
+        {/* Deskripsi */}
+        {job.deskripsi_posisi && (
+          <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-200">
+            <h3 className="font-bold text-gray-900 mb-3">📝 Deskripsi Pekerjaan</h3>
+            <div className="text-gray-700 text-sm leading-relaxed space-y-2">
+              {job.deskripsi_posisi.split('\n').map((paragraph: string, index: number) => (
+                paragraph.trim() && (
+                  <p key={index}>{paragraph}</p>
+                )
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Kuota & Pendaftar */}
+        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-200">
+          <div className="flex justify-between items-center">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary-900">{job.jumlah_kuota}</div>
+              <div className="text-gray-600 text-xs mt-1">Kuota Tersedia</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{job.jumlah_terdaftar}</div>
+              <div className="text-gray-600 text-xs mt-1">Sudah Daftar</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed CTA Button */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+          <button
+            onClick={handleDaftar}
+            className="w-full bg-gradient-to-r from-primary-900 to-purple-900 text-white py-4 px-4 rounded-xl font-bold text-lg hover:from-primary-800 hover:to-purple-800 transition-all duration-200 shadow-lg"
+          >
+            📝 Daftar Sekarang
+          </button>
+          <p className="text-xs text-gray-500 text-center mt-2">
+            Akan dibuka di halaman resmi MagangHub
+          </p>
+        </div>
+
+        {/* Spacer for fixed button */}
+        <div className="h-20"></div>
       </div>
     </div>
   );

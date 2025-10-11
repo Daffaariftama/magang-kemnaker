@@ -68,7 +68,6 @@ interface Stats {
   "Jumlah Peserta Magang": number;
 }
 
-
 export const useJobs = () => {
   // Load state dari localStorage (lebih persisten) untuk data jobs
   const [allJobs, setAllJobs] = useState<Job[]>(() => {
@@ -226,7 +225,8 @@ export const useJobs = () => {
     }
 
     setFilteredJobs(filtered);
-    // Jangan reset currentPage saat apply filters, biarkan user tetap di halaman yang sama
+    // Reset ke halaman 1 setiap kali filter berubah
+    setCurrentPage(1);
   };
 
   // Fungsi yang sederhana - langsung return job tanpa async
@@ -260,6 +260,13 @@ export const useJobs = () => {
     console.log('🔄 All cache cleared and state reset');
   };
 
+  // Fungsi untuk reset pagination saja
+  const resetPagination = () => {
+    setCurrentPage(1);
+    sessionStorage.setItem('magang_currentPage', '1');
+    console.log('🔄 Pagination reset to page 1');
+  };
+
   // Load stats saat component mount (hanya sekali)
   useEffect(() => {
     fetchAllStats();
@@ -289,9 +296,23 @@ export const useJobs = () => {
     sessionStorage.setItem('magang_previous_province', filters.provinsi);
   }, [filters.provinsi]);
 
-  // Apply filters ketika programStudi atau jabatan berubah
+  // Reset pagination ketika programStudi atau jabatan berubah
   useEffect(() => {
     if (allJobs.length > 0) {
+      // Cek apakah filter programStudi atau jabatan berubah
+      const previousProgramStudi = sessionStorage.getItem('magang_previous_programStudi');
+      const previousJabatan = sessionStorage.getItem('magang_previous_jabatan');
+      
+      if (previousProgramStudi !== filters.programStudi || previousJabatan !== filters.jabatan) {
+        console.log('🔄 Filter changed - resetting pagination');
+        resetPagination();
+      }
+      
+      // Simpan state filter saat ini untuk pengecekan berikutnya
+      sessionStorage.setItem('magang_previous_programStudi', filters.programStudi);
+      sessionStorage.setItem('magang_previous_jabatan', filters.jabatan);
+      
+      // Apply filters
       applyFilters();
     }
   }, [allJobs, filters.programStudi, filters.jabatan]);

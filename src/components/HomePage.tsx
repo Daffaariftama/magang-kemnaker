@@ -23,7 +23,7 @@ const HomePage = () => {
 
   const mainContentRef = useRef<HTMLDivElement>(null);
   const hasRestoredScroll = useRef(false);
-  
+
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Effect untuk show/hide scroll to top button
@@ -32,8 +32,8 @@ const HomePage = () => {
       setShowScrollTop(window.scrollY > 300);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToFilter = () => {
@@ -41,10 +41,10 @@ const HomePage = () => {
     if (filterSection) {
       const headerHeight = 80; // Adjust sesuai tinggi header
       const filterPosition = filterSection.offsetTop - headerHeight;
-      
+
       window.scrollTo({
         top: filterPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -306,53 +306,35 @@ const HomePage = () => {
         </section>
         {/* Info Jumlah Lowongan */}
         {!fetchProgress.isFetchingAll && (
-          <div className="card p-6 mb-8">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-                  <p className="text-gray-700 text-lg">
-                    Menampilkan{" "}
-                    <strong className="text-primary-900">
-                      {pagination.from}-{pagination.to}
-                    </strong>{" "}
-                    dari{" "}
-                    <strong className="text-primary-900">
-                      {pagination.total}
-                    </strong>{" "}
-                    lowongan magang
-                  </p>
+          <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border border-gray-200">
+            {/* Main Info Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              {/* Results Info */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-gray-900 font-semibold text-sm sm:text-base">
+                    {pagination.from}-{pagination.to}
+                  </span>
                 </div>
-
-                {/* Info Filter Aktif */}
-                {getActiveFiltersText() && (
-                  <div className="mt-3 p-4 bg-gradient-to-r from-primary-50 to-indigo-50 rounded-xl border border-primary-200">
-                    <div className="flex items-center">
-                      <svg
-                        className="w-5 h-5 text-primary-600 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
-                        />
-                      </svg>
-                      <p className="text-primary-800 font-medium">
-                        Filter aktif: {getActiveFiltersText()}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                <div className="text-gray-600 text-sm sm:text-base">
+                  dari{" "}
+                  <span className="font-semibold text-primary-900">
+                    {pagination.total}
+                  </span>{" "}
+                  lowongan
+                </div>
               </div>
 
+              {/* Page Info - Hidden on mobile when filters active */}
               {pagination.total > 0 && (
-                <div className="flex items-center bg-primary-100 text-primary-800 px-4 py-2 rounded-lg font-medium">
+                <div
+                  className={`flex items-center bg-primary-50 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium ${
+                    getActiveFiltersText() ? "hidden sm:flex" : "flex"
+                  }`}
+                >
                   <svg
-                    className="w-4 h-4 mr-2"
+                    className="w-4 h-4 mr-1.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -364,10 +346,68 @@ const HomePage = () => {
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  Halaman {pagination.current_page} dari {pagination.last_page}
+                  Halaman {pagination.current_page}/{pagination.last_page}
                 </div>
               )}
             </div>
+
+            {/* Active Filters - Compact */}
+            {getActiveFiltersText() && (
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex items-center text-primary-700 text-sm font-medium">
+                    <svg
+                      className="w-4 h-4 mr-1.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+                      />
+                    </svg>
+                    Filter:
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {filters.programStudi && (
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1.5 rounded-lg font-medium border border-blue-200">
+                        🎓 {filters.programStudi}
+                      </span>
+                    )}
+                    {filters.jabatan && (
+                      <span className="bg-green-100 text-green-800 text-xs px-2.5 py-1.5 rounded-lg font-medium border border-green-200">
+                        💼 {filters.jabatan}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Page Info - Only show when filters active */}
+            {pagination.total > 0 && getActiveFiltersText() && (
+              <div className="mt-3 pt-3 border-t border-gray-200 sm:hidden">
+                <div className="flex items-center justify-center bg-primary-50 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium w-fit mx-auto">
+                  <svg
+                    className="w-4 h-4 mr-1.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Halaman {pagination.current_page}/{pagination.last_page}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -548,17 +588,17 @@ const HomePage = () => {
           className="fixed bottom-4 right-4 z-40 bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-full shadow-lg border border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:scale-105 active:scale-95"
           aria-label="Scroll ke filter"
         >
-          <svg 
-            className="w-4 h-4" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
             />
           </svg>
         </button>
