@@ -5,6 +5,7 @@ import FilterBar from "./FilterBar";
 import Loading from "./Loading";
 import RunningMessage from "./RunningMessage";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const HomePage = () => {
   const {
@@ -498,6 +499,8 @@ const HomePage = () => {
           </svg>
         </button>
       )}
+
+      <Footer></Footer>
     </div>
   );
 };

@@ -8,15 +8,37 @@ const JobDetail = () => {
   const navigate = useNavigate();
   const { getJobDetail, isDataLoaded } = useJobs();
   const [job, setJob] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    if (id && isDataLoaded()) {
-      const jobData = getJobDetail(id);
-      setJob(jobData);
+    // Reset state ketika id berubah
+    setJob(null);
+    setIsLoading(true);
+
+    if (id) {
+      // Tunggu sampai data benar-benar loaded
+      const checkData = () => {
+        if (isDataLoaded()) {
+          const jobData = getJobDetail(id);
+          if (jobData) {
+            setJob(jobData);
+            setIsLoading(false);
+          } else {
+            // Data tidak ditemukan
+            setIsLoading(false);
+          }
+        } else {
+          // Data belum loaded, coba lagi dalam 100ms
+          setTimeout(checkData, 100);
+        }
+      };
+
+      checkData();
     }
   }, [id, getJobDetail, isDataLoaded]);
 
-  if (!isDataLoaded()) {
+  // Tampilkan loading sampai proses selesai
+  if (isLoading || !isDataLoaded()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loading message="Memuat data lowongan..." />

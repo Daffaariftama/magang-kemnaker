@@ -193,4 +193,30 @@
   .group:hover .animate-marquee-infinite {
     animation-play-state: paused;
   }
+
+  .Typewriter__cursor {
+    animation: Typewriter-cursor 1s infinite;
+    font-weight: 300;
+    margin-left: 2px;
+  }
+
+  @keyframes Typewriter-cursor {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) skewX(-12deg);
+    }
+    100% {
+      transform: translateX(200%) skewX(-12deg);
+    }
+  }
 }

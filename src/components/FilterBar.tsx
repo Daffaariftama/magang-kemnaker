@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Select from 'react-select';
 
 interface FilterBarProps {
   filters: {
@@ -15,6 +16,11 @@ interface FilterBarProps {
   };
 }
 
+interface ProvinceOption {
+  value: string;
+  label: string;
+}
+
 const FilterBar: React.FC<FilterBarProps> = ({
   filters,
   onFilterChange,
@@ -22,64 +28,69 @@ const FilterBar: React.FC<FilterBarProps> = ({
 }) => {
   const [localFilters, setLocalFilters] = useState(filters);
 
-  const provinces = [
-    { code: "11", name: "ACEH" },
-    { code: "12", name: "SUMATERA UTARA" },
-    { code: "13", name: "SUMATERA BARAT" },
-    { code: "14", name: "RIAU" },
-    { code: "15", name: "JAMBI" },
-    { code: "16", name: "SUMATERA SELATAN" },
-    { code: "17", name: "BENGKULU" },
-    { code: "18", name: "LAMPUNG" },
-    { code: "19", name: "KEPULAUAN BANGKA BELITUNG" },
-    { code: "21", name: "KEPULAUAN RIAU" },
-    { code: "31", name: "DKI JAKARTA" },
-    { code: "32", name: "JAWA BARAT" },
-    { code: "33", name: "JAWA TENGAH" },
-    { code: "34", name: "DI YOGYAKARTA" },
-    { code: "35", name: "JAWA TIMUR" },
-    { code: "36", name: "BANTEN" },
-    { code: "51", name: "BALI" },
-    { code: "52", name: "NUSA TENGGARA BARAT" },
-    { code: "53", name: "NUSA TENGGARA TIMUR" },
-    { code: "61", name: "KALIMANTAN BARAT" },
-    { code: "62", name: "KALIMANTAN TENGAH" },
-    { code: "63", name: "KALIMANTAN SELATAN" },
-    { code: "64", name: "KALIMANTAN TIMUR" },
-    { code: "65", name: "KALIMANTAN UTARA" },
-    { code: "71", name: "SULAWESI UTARA" },
-    { code: "72", name: "SULAWESI TENGAH" },
-    { code: "73", name: "SULAWESI SELATAN" },
-    { code: "74", name: "SULAWESI TENGGARA" },
-    { code: "75", name: "GORONTALO" },
-    { code: "76", name: "SULAWESI BARAT" },
-    { code: "81", name: "MALUKU" },
-    { code: "82", name: "MALUKU UTARA" },
-    { code: "91", name: "PAPUA" },
-    { code: "92", name: "PAPUA BARAT" },
-    { code: "93", name: "PAPUA SELATAN" },
-    { code: "94", name: "PAPUA TENGAH" },
-    { code: "95", name: "PAPUA PEGUNUNGAN" },
+  const provinces: ProvinceOption[] = [
+    { value: "11", label: "ACEH" },
+    { value: "12", label: "SUMATERA UTARA" },
+    { value: "13", label: "SUMATERA BARAT" },
+    { value: "14", label: "RIAU" },
+    { value: "15", label: "JAMBI" },
+    { value: "16", label: "SUMATERA SELATAN" },
+    { value: "17", label: "BENGKULU" },
+    { value: "18", label: "LAMPUNG" },
+    { value: "19", label: "KEPULAUAN BANGKA BELITUNG" },
+    { value: "21", label: "KEPULAUAN RIAU" },
+    { value: "31", label: "DKI JAKARTA" },
+    { value: "32", label: "JAWA BARAT" },
+    { value: "33", label: "JAWA TENGAH" },
+    { value: "34", label: "DI YOGYAKARTA" },
+    { value: "35", label: "JAWA TIMUR" },
+    { value: "36", label: "BANTEN" },
+    { value: "51", label: "BALI" },
+    { value: "52", label: "NUSA TENGGARA BARAT" },
+    { value: "53", label: "NUSA TENGGARA TIMUR" },
+    { value: "61", label: "KALIMANTAN BARAT" },
+    { value: "62", label: "KALIMANTAN TENGAH" },
+    { value: "63", label: "KALIMANTAN SELATAN" },
+    { value: "64", label: "KALIMANTAN TIMUR" },
+    { value: "65", label: "KALIMANTAN UTARA" },
+    { value: "71", label: "SULAWESI UTARA" },
+    { value: "72", label: "SULAWESI TENGAH" },
+    { value: "73", label: "SULAWESI SELATAN" },
+    { value: "74", label: "SULAWESI TENGGARA" },
+    { value: "75", label: "GORONTALO" },
+    { value: "76", label: "SULAWESI BARAT" },
+    { value: "81", label: "MALUKU" },
+    { value: "82", label: "MALUKU UTARA" },
+    { value: "91", label: "PAPUA" },
+    { value: "92", label: "PAPUA BARAT" },
+    { value: "93", label: "PAPUA SELATAN" },
+    { value: "94", label: "PAPUA TENGAH" },
+    { value: "95", label: "PAPUA PEGUNUNGAN" },
   ];
+
+  // Find current province option
+  const getCurrentProvince = (): ProvinceOption | null => {
+    return provinces.find(province => province.value === localFilters.provinsi) || null;
+  };
 
   const handleProgramStudiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFilters = { ...localFilters, programStudi: e.target.value };
     setLocalFilters(newFilters);
-    // Langsung panggil onFilterChange untuk reset pagination
     onFilterChange(newFilters);
   };
 
   const handleJabatanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFilters = { ...localFilters, jabatan: e.target.value };
     setLocalFilters(newFilters);
-    // Langsung panggil onFilterChange untuk reset pagination
     onFilterChange(newFilters);
   };
 
-  const handleProvinsiChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFilters = { ...localFilters, provinsi: e.target.value };
+  const handleProvinsiChange = (selectedOption: ProvinceOption | null) => {
+    const newFilters = { 
+      ...localFilters, 
+      provinsi: selectedOption ? selectedOption.value : "" 
+    };
     setLocalFilters(newFilters);
-    // Langsung panggil onFilterChange untuk reset pagination
     onFilterChange(newFilters);
   };
 
@@ -89,10 +100,91 @@ const FilterBar: React.FC<FilterBarProps> = ({
     onFilterChange(resetFilters);
   };
 
-  // Effect untuk sync localFilters dengan props filters (jika ada perubahan dari luar)
+  const clearProgramStudi = () => {
+    const newFilters = { ...localFilters, programStudi: "" };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
+  const clearJabatan = () => {
+    const newFilters = { ...localFilters, jabatan: "" };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
+  // Effect untuk sync localFilters dengan props filters
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters]);
+
+  // Custom styles for react-select
+  const customStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      padding: '2px 4px',
+      border: '1px solid #D1D5DB',
+      borderRadius: '12px',
+      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      '&:hover': {
+        borderColor: '#D1D5DB'
+      },
+      backgroundColor: fetchProgress.isFetchingAll ? '#F3F4F6' : '#FFFFFF',
+      cursor: fetchProgress.isFetchingAll ? 'not-allowed' : 'default'
+    }),
+    menu: (base: any) => ({
+      ...base,
+      borderRadius: '12px',
+      border: '1px solid #E5E7EB',
+      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      zIndex: 50
+    }),
+    menuList: (base: any) => ({
+      ...base,
+      padding: 0,
+      borderRadius: '12px'
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected 
+        ? '#4F46E5' 
+        : state.isFocused 
+        ? '#F3F4F6' 
+        : '#FFFFFF',
+      color: state.isSelected ? '#FFFFFF' : '#374151',
+      padding: '12px 16px',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: state.isSelected ? '#4F46E5' : '#E5E7EB'
+      }
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: '#9CA3AF'
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: '#374151'
+    }),
+    indicatorSeparator: () => ({
+      display: 'none'
+    }),
+    dropdownIndicator: (base: any, state: any) => ({
+      ...base,
+      color: '#6B7280',
+      padding: '4px',
+      transition: 'transform 0.2s',
+      transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0)'
+    }),
+    clearIndicator: (base: any) => ({
+      ...base,
+      color: '#6B7280',
+      padding: '4px',
+      cursor: 'pointer',
+      '&:hover': {
+        color: '#374151'
+      }
+    })
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
@@ -209,24 +301,19 @@ const FilterBar: React.FC<FilterBarProps> = ({
               value={localFilters.programStudi}
               onChange={handleProgramStudiChange}
               placeholder="isi program studi..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white transition-all duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white transition-all duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
               disabled={fetchProgress.isFetchingAll}
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {localFilters.programStudi && (
+              <button
+                onClick={clearProgramStudi}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -254,24 +341,19 @@ const FilterBar: React.FC<FilterBarProps> = ({
               value={localFilters.jabatan}
               onChange={handleJabatanChange}
               placeholder="Cari posisi..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white transition-all duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white transition-all duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
               disabled={fetchProgress.isFetchingAll}
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {localFilters.jabatan && (
+              <button
+                onClick={clearJabatan}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -299,35 +381,18 @@ const FilterBar: React.FC<FilterBarProps> = ({
             </svg>
             <span>Provinsi</span>
           </label>
-          <div className="relative">
-            <select
-              value={localFilters.provinsi}
-              onChange={handleProvinsiChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white appearance-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
-              disabled={fetchProgress.isFetchingAll}
-            >
-              {provinces.map((province) => (
-                <option key={province.code} value={province.code}>
-                  {province.name}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
+          <Select
+            value={getCurrentProvince()}
+            onChange={handleProvinsiChange}
+            options={provinces}
+            placeholder="Cari provinsi..."
+            isDisabled={fetchProgress.isFetchingAll}
+            isSearchable
+            noOptionsMessage={() => "Tidak ada provinsi yang sesuai"}
+            styles={customStyles}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
       </div>
     </div>

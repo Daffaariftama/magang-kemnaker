@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import  Typewriter  from 'typewriter-effect';
-import CountUp from 'react-countup';
-import { useJobs } from '../hooks/useJobs';
+import { useState, useEffect, useRef } from "react";
+import Typewriter from "typewriter-effect";
+import CountUp from "react-countup";
+import { useJobs } from "../hooks/useJobs";
 
 const Header = () => {
   const { stats, statsLoading } = useJobs();
@@ -27,16 +27,16 @@ const Header = () => {
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'Jt';
+      return (num / 1000000).toFixed(1) + "Jt";
     }
     if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'Rb';
+      return (num / 1000).toFixed(1) + "Rb";
     }
     return num.toString();
   };
 
   return (
-    <header 
+    <header
       ref={headerRef}
       className="relative bg-gradient-to-r from-primary-900 via-primary-800 to-purple-900 text-white overflow-hidden min-h-screen h-screen flex items-center"
     >
@@ -64,28 +64,63 @@ const Header = () => {
               </span>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight">
-              Temukan{" "}
-              <span className="bg-gradient-to-r from-amber-300 to-yellow-400 bg-clip-text text-transparent">
-                Magang Impian
-              </span>{" "}
-              Anda
-            </h1>
+            {/* Main Heading dengan Typewriter Effect yang Lebih Natural */}
+            <div className="mb-4 md:mb-6">
+              <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                <div className="flex flex-col items-center justify-center">
+                  {/* Baris Pertama */}
+                  <div className="flex justify-center items-baseline min-h-[1.2em] mb-2">
+                    <span className="whitespace-nowrap">Temukan</span>
+                    <span className="bg-gradient-to-r from-amber-300 to-yellow-400 bg-clip-text text-transparent mx-2 min-w-[220px] text-center inline-block">
+                      <Typewriter
+                        options={{
+                          strings: ["Pasangan", "Magang"],
+                          autoStart: true,
+                          loop: true,
+                          delay: 120,
+                          deleteSpeed: 80,
+                          cursor: "|",
+                          cursorClassName:
+                            "Typewriter__cursor text-amber-300 ml-1",
+                        }}
+                        onInit={(typewriter) => {
+                          typewriter
+                            .typeString("Pasangan")
+                            .pauseFor(2500) // Jeda lebih lama setelah selesai mengetik
+                            .deleteChars(8) // Hapus perlahan
+                            .pauseFor(500)
+                            .typeString("Magang")
+                            .pauseFor(2500) // Jeda lebih lama
+                            .deleteChars(6)
+                            .pauseFor(500)
+                            .start();
+                        }}
+                      />
+                    </span>
+                  </div>
+
+                  {/* Baris Kedua */}
+                  <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">
+                    Impian Anda
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Animated Subheading */}
             <div className="text-lg sm:text-xl md:text-2xl text-primary-100 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4 h-16 sm:h-20 flex items-center justify-center">
               <Typewriter
                 options={{
                   strings: [
-                    'Mulai perjalanan karirmu dengan pengalaman magang berkualitas...',
-                    'Dapatkan pengalaman praktis dari perusahaan ternama Indonesia yeahh..',
+                    "Cari magang atau cari jodoh? Why not both? 😉",
+                    "Your career love story starts here! 💕",
+                    "Bukan PDKT, tapi Professional Development & Karir Transformation! 💫",
                   ],
                   autoStart: true,
                   loop: true,
-                  delay: 50,
-                  deleteSpeed: 30,
-                  cursor: '▌'
+                  delay: 45,
+                  deleteSpeed: 25,
+                  cursor: "▌",
                 }}
               />
             </div>
@@ -186,7 +221,7 @@ const Header = () => {
               </div>
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button dengan Efek Berkilau */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <button
                 onClick={() =>
@@ -194,10 +229,15 @@ const Header = () => {
                     .getElementById("filter-section")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="bg-gradient-to-r from-amber-400 to-orange-500 text-primary-900 px-6 py-3 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg hover:from-amber-500 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-primary-900 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center w-full sm:w-auto justify-center"
+                className="relative bg-gradient-to-r from-amber-400 to-orange-500 text-primary-900 px-6 py-3 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg hover:from-amber-500 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-primary-900 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center w-full sm:w-auto justify-center overflow-hidden group"
               >
+                {/* Efek Kilau */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                </div>
+
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 mr-2"
+                  className="w-5 h-5 sm:w-6 sm:h-6 mr-2 relative z-10"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,7 +249,7 @@ const Header = () => {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-                Cari Magang Sekarang
+                <span className="relative z-10">Cari Magang Sekarang</span>
               </button>
             </div>
           </div>
