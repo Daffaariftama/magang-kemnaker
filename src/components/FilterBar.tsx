@@ -119,7 +119,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
   // Custom styles for react-select
   const customStyles = {
-    control: (base: any, state: any) => ({
+    control: (base: any) => ({
       ...base,
       padding: '2px 4px',
       border: '1px solid #D1D5DB',
