@@ -1,6 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
-import JobDetail from './components/JobDetail';
+// import JobDetail from './components/JobDetail';
 
 function App() {
   // Set to true untuk mengaktifkan maintenance mode
@@ -16,7 +16,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/lowongan/:id" element={<JobDetail />} />
+        {/* <Route path="/lowongan/:id" element={<JobDetail />} /> */}
       </Routes>
     </Router>
   );

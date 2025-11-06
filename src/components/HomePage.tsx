@@ -6,6 +6,8 @@ import Loading from "./Loading";
 import RunningMessage from "./RunningMessage";
 import Header from "./Header";
 import Footer from "./Footer";
+import ExportSection from './ExportSection';
+import { exportService } from '../services/exportService';
 
 const HomePage = () => {
   const {
@@ -15,15 +17,37 @@ const HomePage = () => {
     pagination,
     filters,
     updateFilters,
+    availableCities, // Tambahkan ini
     changePage,
     fetchProgress,
     refreshData,
+      allJobs, // Ambil semua jobs untuk export
   } = useJobs();
 
   const mainContentRef = useRef<HTMLDivElement>(null);
   const jobsGridRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const lastPageRef = useRef(pagination.current_page);
+
+  const [allJobsForExport, setAllJobsForExport] = useState<any[]>([]);
+
+  // Fungsi untuk save jobs ke export service
+  const handleSaveJobsForExport = async (jobs: any[]) => {
+    try {
+      await exportService.saveJobsForExport(filters.provinsi, jobs);
+      setAllJobsForExport(jobs);
+    } catch (error) {
+      console.error('Error saving jobs for export:', error);
+    }
+  };
+
+  // Simpan jobs ketika data berubah
+  useEffect(() => {
+    if (allJobs.length > 0) {
+      handleSaveJobsForExport(allJobs);
+    }
+  }, [allJobs]);
+  
 
   // Effect untuk show/hide scroll to top button
   useEffect(() => {
@@ -53,7 +77,7 @@ const HomePage = () => {
     const currentScrollY = window.scrollY;
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
-    
+
     if (currentScrollY < 300) {
       return;
     }
@@ -65,7 +89,7 @@ const HomePage = () => {
 
         window.scrollTo({
           top: gridPosition,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     }
@@ -98,8 +122,12 @@ const HomePage = () => {
   // SCROLL RESTORATION - DIPERTAHANKAN (hanya ini yang disimpan)
   useEffect(() => {
     if (!loading && !fetchProgress.isFetchingAll && jobs.length > 0) {
-      const savedScrollPosition = sessionStorage.getItem("magang_scrollPosition");
-      const shouldRestoreScroll = sessionStorage.getItem("magang_shouldRestoreScroll");
+      const savedScrollPosition = sessionStorage.getItem(
+        "magang_scrollPosition"
+      );
+      const shouldRestoreScroll = sessionStorage.getItem(
+        "magang_shouldRestoreScroll"
+      );
 
       if (savedScrollPosition && shouldRestoreScroll === "true") {
         const scrollY = parseInt(savedScrollPosition);
@@ -154,6 +182,10 @@ const HomePage = () => {
       activeFilters.push(`Posisi: "${filters.jabatan}"`);
     }
 
+    if (filters.kota) {
+      activeFilters.push(`Kota: "${filters.kota}"`);
+    }
+
     return activeFilters.join(" dan ");
   };
 
@@ -203,6 +235,7 @@ const HomePage = () => {
             onFilterChange={handleFilterChange}
             loading={loading}
             fetchProgress={fetchProgress}
+            availableCities={availableCities} // Tambahkan prop ini
           />
         </section>
 
@@ -284,6 +317,11 @@ const HomePage = () => {
                         💼 {filters.jabatan}
                       </span>
                     )}
+                    {filters.kota && (
+                      <span className="bg-purple-100 text-purple-800 text-xs px-2.5 py-1.5 rounded-lg font-medium border border-purple-200">
+                        🏙️ {filters.kota}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -323,7 +361,7 @@ const HomePage = () => {
         ) : (
           <>
             {/* Grid Layout 3 Kolom - dengan ref untuk scroll */}
-            <div 
+            <div
               ref={jobsGridRef}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
             >
@@ -344,7 +382,8 @@ const HomePage = () => {
                       updateFilters({
                         programStudi: "",
                         jabatan: "",
-                        provinsi: "32",
+                        provinsi: "11",
+                        kota: ""
                       })
                     }
                     className="btn-primary"
@@ -418,7 +457,9 @@ const HomePage = () => {
                     {/* Navigation */}
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handlePageChange(pagination.current_page - 1)}
+                        onClick={() =>
+                          handlePageChange(pagination.current_page - 1)
+                        }
                         disabled={pagination.current_page === 1}
                         className="p-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 transition-colors"
                         title="Sebelumnya"
@@ -463,7 +504,9 @@ const HomePage = () => {
 
                         {pagination.current_page < pagination.last_page && (
                           <button
-                            onClick={() => handlePageChange(pagination.last_page)}
+                            onClick={() =>
+                              handlePageChange(pagination.last_page)
+                            }
                             className="w-7 h-7 text-xs border border-gray-300 rounded text-gray-600 bg-white hover:bg-gray-50 transition-colors"
                           >
                             {pagination.last_page}
@@ -472,7 +515,9 @@ const HomePage = () => {
                       </div>
 
                       <button
-                        onClick={() => handlePageChange(pagination.current_page + 1)}
+                        onClick={() =>
+                          handlePageChange(pagination.current_page + 1)
+                        }
                         disabled={
                           pagination.current_page === pagination.last_page
                         }
@@ -524,6 +569,13 @@ const HomePage = () => {
           </svg>
         </button>
       )}
+
+      <div className="container mx-auto px-4 py-6">
+      <ExportSection 
+        allJobs={allJobsForExport}
+        onSaveJobs={handleSaveJobsForExport}
+      />
+    </div>
 
       <Footer />
     </div>
