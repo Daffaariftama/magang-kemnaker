@@ -46,6 +46,7 @@ interface Filters {
   jabatan: string;
   provinsi: string;
   kota: string;
+  perusahaan: string; // Tambahkan ini
 }
 
 interface Pagination {
@@ -76,6 +77,7 @@ export const useJobs = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [availableCompanies, setAvailableCompanies] = useState<string[]>([]); // Tambahkan state baru
 
   const [itemsPerPage] = useState(21);
   const [fetchProgress, setFetchProgress] = useState<FetchProgress>({
@@ -90,14 +92,15 @@ export const useJobs = () => {
   const [filters, setFilters] = useState<Filters>({
     programStudi: "",
     jabatan: "",
-    provinsi: "11", // Default ke Aceh
+    provinsi: "11",
     kota: "",
+    perusahaan: "", // Tambahkan default value
   });
 
   // Fungsi untuk extract kota-kota unik dari data jobs
   const extractCitiesFromJobs = (jobs: Job[]): string[] => {
     const cities = new Set<string>();
-    jobs.forEach((job) => {
+    jobs.forEach(job => {
       if (job.perusahaan.nama_kabupaten) {
         cities.add(job.perusahaan.nama_kabupaten);
       }
@@ -105,15 +108,34 @@ export const useJobs = () => {
     return Array.from(cities).sort();
   };
 
-  // Update available cities ketika allJobs berubah
+  // Fungsi untuk extract perusahaan unik dari data jobs
+  const extractCompaniesFromJobs = (jobs: Job[]): string[] => {
+    const companies = new Set<string>();
+    jobs.forEach(job => {
+      if (job.perusahaan.nama_perusahaan) {
+        companies.add(job.perusahaan.nama_perusahaan);
+      }
+    });
+    return Array.from(companies).sort();
+  };
+
+  // Update available cities dan companies ketika allJobs berubah
   useEffect(() => {
     if (allJobs.length > 0) {
       const cities = extractCitiesFromJobs(allJobs);
+      const companies = extractCompaniesFromJobs(allJobs);
+      
       setAvailableCities(cities);
-
+      setAvailableCompanies(companies);
+      
       // Reset kota jika kota yang dipilih tidak ada di list baru
       if (filters.kota && !cities.includes(filters.kota)) {
-        setFilters((prev) => ({ ...prev, kota: "" }));
+        setFilters(prev => ({ ...prev, kota: "" }));
+      }
+      
+      // Reset perusahaan jika perusahaan yang dipilih tidak ada di list baru
+      if (filters.perusahaan && !companies.includes(filters.perusahaan)) {
+        setFilters(prev => ({ ...prev, perusahaan: "" }));
       }
     }
   }, [allJobs]);
@@ -138,7 +160,7 @@ export const useJobs = () => {
   };
 
   // Fungsi untuk fetch semua data dari semua halaman
-  const fetchAllJobs = async (provinceCode = "32", forceRefresh = false) => {
+  const fetchAllJobs = async (provinceCode = "1", forceRefresh = false) => {
     try {
       setFetchProgress({ current: 0, total: 0, isFetchingAll: true });
       setLoading(true);
@@ -149,6 +171,7 @@ export const useJobs = () => {
         setAllJobs([]);
         setFilteredJobs([]);
         setAvailableCities([]);
+        setAvailableCompanies([]);
       }
 
       const firstPageData = await fetchJobs(1, 20, provinceCode);
@@ -212,9 +235,13 @@ export const useJobs = () => {
 
     if (currentFilters.kota) {
       filtered = filtered.filter((job) =>
-        job.perusahaan.nama_kabupaten
-          .toLowerCase()
-          .includes(currentFilters.kota.toLowerCase())
+        job.perusahaan.nama_kabupaten.toLowerCase().includes(currentFilters.kota.toLowerCase())
+      );
+    }
+
+    if (currentFilters.perusahaan) {
+      filtered = filtered.filter((job) =>
+        job.perusahaan.nama_perusahaan.toLowerCase().includes(currentFilters.perusahaan.toLowerCase())
       );
     }
 
@@ -237,7 +264,8 @@ export const useJobs = () => {
     setFilteredJobs([]);
     setCurrentPage(1);
     setAvailableCities([]);
-    console.log("🔄 State reset");
+    setAvailableCompanies([]);
+    console.log('🔄 State reset');
   };
 
   // Load stats saat component mount (hanya sekali)
@@ -255,12 +283,12 @@ export const useJobs = () => {
     fetchAllJobs(filters.provinsi, true);
   }, [filters.provinsi]);
 
-  // Apply filters ketika programStudi, jabatan, atau kota berubah
+  // Apply filters ketika programStudi, jabatan, kota, atau perusahaan berubah
   useEffect(() => {
     if (allJobs.length > 0) {
       applyFilters();
     }
-  }, [allJobs, filters.programStudi, filters.jabatan, filters.kota]);
+  }, [allJobs, filters.programStudi, filters.jabatan, filters.kota, filters.perusahaan]);
 
   // Reset pagination setiap kali filter berubah
   const updateFilters = (newFilters: Filters) => {
@@ -301,15 +329,14 @@ export const useJobs = () => {
     stats,
     statsLoading,
     availableCities,
+    availableCompanies, // Export availableCompanies
     updateFilters,
     changePage,
     fetchProgress,
     getJobDetail,
     isDataLoaded,
+    allJobs, // Untuk export
     refetch: () => fetchAllJobs(filters.provinsi, true),
     refreshData,
-      // Tambahkan ini untuk export
-  allJobs, // Export semua data, bukan hanya yang difilter
-  allJobsForExport: allJobs, // Alias untuk konsistensi
   };
 };

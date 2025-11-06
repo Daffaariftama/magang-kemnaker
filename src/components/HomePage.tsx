@@ -6,8 +6,8 @@ import Loading from "./Loading";
 import RunningMessage from "./RunningMessage";
 import Header from "./Header";
 import Footer from "./Footer";
-import ExportSection from './ExportSection';
-import { exportService } from '../services/exportService';
+import ExportSection from "./ExportSection";
+import { exportService } from "../services/exportService";
 
 const HomePage = () => {
   const {
@@ -20,8 +20,9 @@ const HomePage = () => {
     availableCities, // Tambahkan ini
     changePage,
     fetchProgress,
+    availableCompanies, // Tambahkan ini
     refreshData,
-      allJobs, // Ambil semua jobs untuk export
+    allJobs, // Ambil semua jobs untuk export
   } = useJobs();
 
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -37,7 +38,7 @@ const HomePage = () => {
       await exportService.saveJobsForExport(filters.provinsi, jobs);
       setAllJobsForExport(jobs);
     } catch (error) {
-      console.error('Error saving jobs for export:', error);
+      console.error("Error saving jobs for export:", error);
     }
   };
 
@@ -47,7 +48,6 @@ const HomePage = () => {
       handleSaveJobsForExport(allJobs);
     }
   }, [allJobs]);
-  
 
   // Effect untuk show/hide scroll to top button
   useEffect(() => {
@@ -171,6 +171,7 @@ const HomePage = () => {
     updateFilters(newFilters);
   };
 
+  // Update getActiveFiltersText untuk include perusahaan:
   const getActiveFiltersText = () => {
     const activeFilters = [];
 
@@ -184,6 +185,10 @@ const HomePage = () => {
 
     if (filters.kota) {
       activeFilters.push(`Kota: "${filters.kota}"`);
+    }
+
+    if (filters.perusahaan) {
+      activeFilters.push(`Perusahaan: "${filters.perusahaan}"`);
     }
 
     return activeFilters.join(" dan ");
@@ -236,6 +241,7 @@ const HomePage = () => {
             loading={loading}
             fetchProgress={fetchProgress}
             availableCities={availableCities} // Tambahkan prop ini
+            availableCompanies={availableCompanies} // Tambahkan ini
           />
         </section>
 
@@ -285,7 +291,6 @@ const HomePage = () => {
                 </div>
               )}
             </div>
-
             {/* Active Filters - Compact */}
             {getActiveFiltersText() && (
               <div className="mt-3 pt-3 border-t border-gray-200">
@@ -322,11 +327,15 @@ const HomePage = () => {
                         🏙️ {filters.kota}
                       </span>
                     )}
+                    {filters.perusahaan && (
+                      <span className="bg-orange-100 text-orange-800 text-xs px-2.5 py-1.5 rounded-lg font-medium border border-orange-200">
+                        🏢 {filters.perusahaan}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             )}
-
             {/* Mobile Page Info - Only show when filters active */}
             {pagination.total > 0 && getActiveFiltersText() && (
               <div className="mt-3 pt-3 border-t border-gray-200 sm:hidden">
@@ -383,7 +392,8 @@ const HomePage = () => {
                         programStudi: "",
                         jabatan: "",
                         provinsi: "11",
-                        kota: ""
+                        kota: "",
+                        perusahaan: ""
                       })
                     }
                     className="btn-primary"
@@ -571,11 +581,11 @@ const HomePage = () => {
       )}
 
       <div className="container mx-auto px-4 py-6">
-      <ExportSection 
-        allJobs={allJobsForExport}
-        onSaveJobs={handleSaveJobsForExport}
-      />
-    </div>
+        <ExportSection
+          allJobs={allJobsForExport}
+          onSaveJobs={handleSaveJobsForExport}
+        />
+      </div>
 
       <Footer />
     </div>
