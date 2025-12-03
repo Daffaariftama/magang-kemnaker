@@ -301,12 +301,16 @@ export const useJobs = () => {
     }
   };
 
+  // NEW: State untuk tracking halaman yang gagal fetch
+  const [failedPages, setFailedPages] = useState<number[]>([]);
+
   // NEW: Fungsi untuk fetch semua data di background dengan IndexedDB caching
   const fetchAllJobsInBackground = async (provinceCode: string = "11", forceRefresh: boolean = false) => {
     cancelCurrentFetch(); // Cancel fetch sebelumnya
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+    setFailedPages([]); // Reset failed pages
 
     try {
       // Check cache first jika bukan force refresh
@@ -349,38 +353,51 @@ export const useJobs = () => {
       });
 
       let allJobsData: Job[] = [...firstPageData.data];
+      const currentFailedPages: number[] = [];
 
       // Fetch halaman berikutnya di background
       for (let page = 2; page <= totalPages; page++) {
         // Check jika fetch dibatalkan sebelum setiap request
         if (abortController.signal.aborted) return;
 
-        const pageData = await fetchJobs(page, 20, provinceCode);
+        try {
+          const pageData = await fetchJobs(page, 20, provinceCode);
 
-        // Check jika fetch dibatalkan setelah request
-        if (abortController.signal.aborted) return;
+          // Check jika fetch dibatalkan setelah request
+          if (abortController.signal.aborted) return;
 
-        allJobsData = [...allJobsData, ...pageData.data];
+          allJobsData = [...allJobsData, ...pageData.data];
 
-        // Update state dengan data baru
-        setAllJobs(allJobsData);
-        setFetchProgress({
-          current: page,
-          total: totalPages,
-          isFetchingAll: true,
-          isBackgroundFetching: true
-        });
+          // Update state dengan data baru
+          setAllJobs(allJobsData);
+          setFetchProgress({
+            current: page,
+            total: totalPages,
+            isFetchingAll: true,
+            isBackgroundFetching: true
+          });
+        } catch (err) {
+          console.warn(`⚠️ Gagal fetch halaman ${page}:`, err);
+          currentFailedPages.push(page);
+          setFailedPages(prev => [...prev, page]);
+          // Delay lebih lama jika error (backoff sederhana)
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
 
         // Small delay untuk tidak overload server
         await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
-      // Save to IndexedDB
+      // Save to IndexedDB (save apa yang kita punya)
       await indexedDBService.saveProvinceData(provinceCode, allJobsData, totalPages);
       setLastFetchTime(Date.now());
 
-      setError(null);
-      console.log(`✅ Data provinsi ${getProvinsiName(provinceCode)} selesai di-load dan disimpan: ${allJobsData.length} lowongan`);
+      if (currentFailedPages.length > 0) {
+        setError(`Gagal mengambil ${currentFailedPages.length} halaman data. Koneksi mungkin tidak stabil.`);
+      } else {
+        setError(null);
+        console.log(`✅ Data provinsi ${getProvinsiName(provinceCode)} selesai di-load dan disimpan: ${allJobsData.length} lowongan`);
+      }
 
     } catch (err: any) {
       // AbortError adalah expected behavior ketika cancel
@@ -403,6 +420,55 @@ export const useJobs = () => {
       }
       abortControllerRef.current = null;
     }
+  };
+
+  // NEW: Fungsi untuk retry halaman yang gagal
+  const retryFailedFetch = async () => {
+    if (failedPages.length === 0) return;
+
+    const pagesToRetry = [...failedPages];
+    setFailedPages([]); // Reset sementara
+    setError(null);
+
+    setFetchProgress(prev => ({
+      ...prev,
+      isBackgroundFetching: true,
+      isFetchingAll: true
+    }));
+
+    let currentAllJobs = [...allJobs];
+    const stillFailedPages: number[] = [];
+    let successCount = 0;
+
+    for (const page of pagesToRetry) {
+      try {
+        const pageData = await fetchJobs(page, 20, filters.provinsi);
+        currentAllJobs = [...currentAllJobs, ...pageData.data];
+        setAllJobs(currentAllJobs);
+        successCount++;
+      } catch (err) {
+        console.warn(`⚠️ Retry gagal untuk halaman ${page}:`, err);
+        stillFailedPages.push(page);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+
+    setFailedPages(stillFailedPages);
+
+    if (stillFailedPages.length > 0) {
+      setError(`Berhasil memulihkan ${successCount} halaman. Masih ada ${stillFailedPages.length} halaman gagal.`);
+    } else {
+      setError(null);
+      // Update cache dengan data lengkap
+      await indexedDBService.saveProvinceData(filters.provinsi, currentAllJobs, Math.ceil(currentAllJobs.length / 20));
+    }
+
+    setFetchProgress(prev => ({
+      ...prev,
+      isBackgroundFetching: false,
+      isFetchingAll: false
+    }));
   };
 
   const applyFilters = (
@@ -558,5 +624,7 @@ export const useJobs = () => {
     refreshData,
     lastFetchTime,
     manualSync: () => fetchAllJobsInBackground(filters.provinsi, true),
+    failedPages,
+    retryFailedFetch,
   };
 };
