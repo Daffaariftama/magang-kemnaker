@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Typewriter from "typewriter-effect";
 import CountUp from "react-countup";
 import { useJobs } from "../hooks/useJobs";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
-  const navigate = useNavigate();
   const { stats, statsLoading } = useJobs();
   const [isVisible, setIsVisible] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
