@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { fetchJobs } from "../services/api";
+import { fetchJobs, overrideJobData } from "../services/api";
 import { fetchStats } from "../services/statsApi";
 import { indexedDBService } from "../services/indexedDBService";
 
@@ -361,7 +361,8 @@ export const useJobs = () => {
 
         if (cachedData.data && cachedData.data.length > 0) {
           console.log(`📦 Loading ${cachedData.data.length} jobs from cache for province ${getProvinsiName(provinceCode)}`);
-          setAllJobs(cachedData.data);
+          // Apply override to cached data as well
+          setAllJobs(cachedData.data.map(overrideJobData));
           setLastFetchTime(cachedData.timestamp);
           setLoading(false);
           return;

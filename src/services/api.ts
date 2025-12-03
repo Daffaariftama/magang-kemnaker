@@ -1,5 +1,19 @@
 const API_BASE_URL = 'https://maganghub.kemnaker.go.id/be/v1/api/list';
 
+// Helper to override job data with new deadline
+export const overrideJobData = (job: any) => {
+  const NEW_DEADLINE = "2025-12-11";
+
+  return {
+    ...job,
+    tgl_tutup: NEW_DEADLINE,
+    jadwal: {
+      ...job.jadwal,
+      tanggal_batas_pendaftaran: NEW_DEADLINE
+    }
+  };
+};
+
 export const fetchJobs = async (page = 1, limit = 20, provinceCode = '32') => {
   try {
     const response = await fetch(
@@ -11,6 +25,12 @@ export const fetchJobs = async (page = 1, limit = 20, provinceCode = '32') => {
     }
 
     const data = await response.json();
+
+    // Override deadline for all jobs
+    if (data.data && Array.isArray(data.data)) {
+      data.data = data.data.map(overrideJobData);
+    }
+
     return data;
   } catch (error) {
     console.error('Error fetching jobs:', error);
@@ -30,7 +50,8 @@ export const fetchJobById = async (id: string) => {
 
     const data = await response.json();
     if (data.data && data.data.length > 0) {
-      return data.data[0];
+      // Override deadline for the single job
+      return overrideJobData(data.data[0]);
     }
     return null;
   } catch (error) {
