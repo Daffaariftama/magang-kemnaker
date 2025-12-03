@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+export type SaveStatus = 'success' | 'already_saved' | 'quota_full' | 'error';
+
 export const useSavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
 
@@ -27,39 +29,40 @@ export const useSavedJobs = () => {
     };
   }, []);
 
-  const saveJob = (job: any) => {
+  const saveJob = (job: any): SaveStatus => {
     try {
       const currentJobs = JSON.parse(localStorage.getItem('magang_savedJobs') || '[]');
 
       if (currentJobs.some((j: any) => j.id_posisi === job.id_posisi)) {
-        return false; // Already saved
+        return 'already_saved';
       }
 
       if (currentJobs.length >= 10) {
-        alert('Maksimal 10 lowongan yang dapat disimpan.');
-        return false;
+        return 'quota_full';
       }
 
       const newJobs = [job, ...currentJobs];
       localStorage.setItem('magang_savedJobs', JSON.stringify(newJobs));
       setSavedJobs(newJobs);
       window.dispatchEvent(new Event('savedJobsUpdated'));
-      return true;
+      return 'success';
     } catch (e) {
       console.error('Error saving job:', e);
-      return false;
+      return 'error';
     }
   };
 
-  const removeJob = (id: string) => {
+  const removeJob = (id: string): boolean => {
     try {
       const currentJobs = JSON.parse(localStorage.getItem('magang_savedJobs') || '[]');
       const newJobs = currentJobs.filter((j: any) => j.id_posisi !== id);
       localStorage.setItem('magang_savedJobs', JSON.stringify(newJobs));
       setSavedJobs(newJobs);
       window.dispatchEvent(new Event('savedJobsUpdated'));
+      return true;
     } catch (e) {
       console.error('Error removing job:', e);
+      return false;
     }
   };
 

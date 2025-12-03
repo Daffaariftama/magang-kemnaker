@@ -6,6 +6,7 @@ interface Filters {
   provinsi: string;
   kota: string;
   perusahaan: string;
+  jenjang: string;
 }
 
 interface FilterBarProps {
@@ -19,6 +20,7 @@ interface FilterBarProps {
   };
   availableCities: string[];
   availableCompanies: string[];
+  availableJenjang: string[];
 }
 
 // Komponen Searchable Dropdown yang reusable
@@ -80,17 +82,15 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         type="button"
         onClick={handleToggle}
         disabled={disabled}
-        className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-left flex items-center justify-between transition-colors ${
-          disabled
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-white text-gray-900 hover:border-gray-400"
-        } ${value ? "text-gray-900" : "text-gray-500"}`}
+        className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-left flex items-center justify-between transition-colors ${disabled
+          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+          : "bg-white text-gray-900 hover:border-gray-400"
+          } ${value ? "text-gray-900" : "text-gray-500"}`}
       >
         <span className="truncate">{value || placeholder}</span>
         <svg
-          className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? "rotate-180" : ""
+            }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -133,11 +133,10 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                   key={index}
                   type="button"
                   onClick={() => handleSelect(option)}
-                  className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 ${
-                    value === option
-                      ? "bg-blue-50 text-primary-900 font-medium"
-                      : "text-gray-700"
-                  }`}
+                  className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 ${value === option
+                    ? "bg-blue-50 text-primary-900 font-medium"
+                    : "text-gray-700"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="truncate text-sm">{option}</span>
@@ -174,6 +173,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   fetchProgress,
   availableCities,
   availableCompanies,
+  availableJenjang,
 }) => {
   const handleProgramStudiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFilterChange({
@@ -208,7 +208,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
   const handlePerusahaanChange = (value: string) => {
     onFilterChange({
       ...filters,
-      perusahaan: value === "Semua Perusahaan" ? "" : value, // Jika "Semua" dipilih, set ke string kosong
+      perusahaan: value === "Semua Perusahaan" ? "" : value,
+    });
+  };
+
+  const handleJenjangChange = (value: string) => {
+    onFilterChange({
+      ...filters,
+      jenjang: value === "Semua Jenjang" ? "" : value,
     });
   };
 
@@ -217,8 +224,9 @@ const FilterBar: React.FC<FilterBarProps> = ({
       programStudi: "",
       jabatan: "",
       provinsi: "1",
-      kota: "", // Reset ke semua kota
-      perusahaan: "", // Reset ke semua perusahaan
+      kota: "",
+      perusahaan: "",
+      jenjang: "",
     });
   };
 
@@ -227,6 +235,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     filters.jabatan ||
     filters.kota ||
     filters.perusahaan ||
+    filters.jenjang ||
     filters.provinsi !== "11";
 
   // Data provinsi
@@ -320,11 +329,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mb-6">
+    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 mb-6">
       {/* Progress Bar untuk Fetching Data */}
       {fetchProgress.isFetchingAll && (
         <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+          <div className="flex justify-between text-xs sm:text-sm text-gray-600 mb-2">
             <span>Mengambil data lowongan...</span>
             <span>
               {fetchProgress.current} / {fetchProgress.total}
@@ -334,16 +343,15 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <div
               className="bg-primary-500 h-2 rounded-full transition-all duration-300"
               style={{
-                width: `${
-                  (fetchProgress.current / fetchProgress.total) * 100
-                }%`,
+                width: `${(fetchProgress.current / fetchProgress.total) * 100
+                  }%`,
               }}
             ></div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {/* Filter Program Studi */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -392,11 +400,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Kota/Kabupaten
-            {availableCities.length > 0 && (
-              <span className="text-xs text-gray-500 ml-1">
-                ({availableCities.length} kota)
-              </span>
-            )}
+           
           </label>
           <SearchableDropdown
             value={filters.kota}
@@ -447,6 +451,31 @@ const FilterBar: React.FC<FilterBarProps> = ({
                   : "Pilih kota untuk melihat perusahaan"}
               </p>
             )}
+        </div>
+
+        {/* Filter Jenjang - Searchable */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Jenjang Pendidikan
+
+          </label>
+          <SearchableDropdown
+            value={filters.jenjang}
+            onChange={handleJenjangChange}
+            options={["Semua Jenjang", ...availableJenjang]}
+            placeholder="Semua Jenjang"
+            disabled={loading || availableJenjang.length === 0 || filters.provinsi === "1"}
+          />
+          {filters.provinsi === "1" && !loading && (
+            <p className="text-xs text-gray-500 mt-1">
+              Pilih provinsi terlebih dahulu
+            </p>
+          )}
+          {filters.provinsi !== "1" && availableJenjang.length === 0 && !loading && (
+            <p className="text-xs text-gray-500 mt-1">
+              Tidak ada data jenjang
+            </p>
+          )}
         </div>
       </div>
 

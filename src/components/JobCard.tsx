@@ -30,12 +30,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const programStudi = parseJSON(job.program_studi);
   const displayedProgramStudi = programStudi.slice(0, 3);
   const remainingCount = programStudi.length - 3;
+  const jenjang = parseJSON(job.jenjang);
 
   const handleCardClick = () => {
-    // Save scroll position before navigating
     sessionStorage.setItem("magang_scrollPosition", window.scrollY.toString());
     sessionStorage.setItem("magang_shouldRestoreScroll", 'true');
-    // Navigate to detail page with job data in state
     navigate(`/lowongan/${job.id_posisi}`, { state: { job } });
   };
 
@@ -75,84 +74,85 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     <>
       <div
         onClick={handleCardClick}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-lg hover:border-primary-300 cursor-pointer h-full flex flex-col group transition-all duration-300"
+        className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-300 cursor-pointer h-full flex flex-col group transition-all duration-300 relative overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full -mr-10 -mt-10 opacity-50 transition-opacity group-hover:opacity-100"></div>
+
         {/* Header - Company & Position */}
-        <div className="flex items-start space-x-3 mb-3">
-          {job.perusahaan.logo && (
+        <div className="flex items-start space-x-4 mb-4 relative z-10">
+          <div className="bg-white p-1.5 rounded-lg border border-gray-100 shadow-sm flex-shrink-0">
             <img
-              src={job.perusahaan.logo}
+              src={job.perusahaan.logo || 'https://via.placeholder.com/150'}
               alt={`Logo ${job.perusahaan.nama_perusahaan}`}
-              className="w-10 h-10 object-contain rounded-lg border border-gray-200 flex-shrink-0"
+              className="w-12 h-12 object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
-          )}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-base font-bold text-gray-900 line-clamp-2 group-hover:text-primary-900 transition-colors leading-tight">
+          </div>
+          <div className="flex-1 min-w-0 pt-0.5">
+            <h2 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-primary-700 transition-colors leading-snug mb-1">
               {job.posisi}
             </h2>
-            <p className="text-primary-900 font-semibold text-sm line-clamp-1 mt-1">
+            <p className="text-gray-600 font-medium text-sm line-clamp-1">
               {job.perusahaan.nama_perusahaan}
             </p>
           </div>
         </div>
 
-        {/* Location & Deadline */}
-        <div className="space-y-2 mb-3">
-          <div className="flex items-center text-gray-600 text-sm">
-            <svg className="w-4 h-4 text-gray-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Info Tags */}
+        <div className="space-y-2.5 mb-4 relative z-10">
+          <div className="flex items-center text-gray-500 text-sm">
+            <svg className="w-4 h-4 mr-2 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
-            <span className="line-clamp-1">{job.perusahaan.nama_kabupaten}, {job.perusahaan.nama_provinsi}</span>
+            <span className="truncate">{job.perusahaan.nama_kabupaten}, {job.perusahaan.nama_provinsi}</span>
           </div>
 
-          <div className="flex items-center text-gray-600 text-sm">
-            <svg className="w-4 h-4 text-gray-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div className="flex items-center text-gray-500 text-sm">
+            <svg className="w-4 h-4 mr-2 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
             </svg>
-            <span>Batas: <strong>{formatDate(job.jadwal?.tanggal_batas_pendaftaran)}</strong></span>
+            <span className="truncate">{jenjang.join(', ') || 'Semua Jenjang'}</span>
           </div>
         </div>
 
-        {/* Program Studi */}
-        <div className="mb-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700">Program Studi:</span>
+        {/* Program Studi Pills */}
+        <div className="mb-4 relative z-10">
+          <div className="flex flex-wrap gap-1.5">
+            {displayedProgramStudi.map((ps: any, index: number) => (
+              <span
+                key={index}
+                className="bg-gray-50 text-gray-600 text-xs px-2.5 py-1 rounded-md border border-gray-100 font-medium truncate max-w-[150px]"
+              >
+                {ps.title}
+              </span>
+            ))}
             {remainingCount > 0 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowProgramStudiModal(true);
                 }}
-                className="text-xs text-primary-900 hover:text-primary-800 font-medium transition-colors bg-primary-50 px-2 py-1 rounded-lg"
+                className="bg-primary-50 text-primary-700 text-xs px-2.5 py-1 rounded-md border border-primary-100 font-medium hover:bg-primary-100 transition-colors"
               >
-                +{remainingCount} lainnya
+                +{remainingCount}
               </button>
             )}
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {displayedProgramStudi.map((ps: any, index: number) => (
-              <span
-                key={index}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-800 text-xs px-2.5 py-1.5 rounded-lg border border-blue-200 font-medium"
-              >
-                {ps.title}
-              </span>
-            ))}
-          </div>
         </div>
 
-        {/* Footer - Applicants & Quota */}
-        <div className="mt-auto pt-3 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm">
-            <div className="text-gray-600">
-              <span className="font-bold text-gray-900">{job.jumlah_terdaftar || 0}</span> pendaftar
-            </div>
-            <div className="text-gray-600">
-              Kuota: <span className="font-bold text-gray-900">{job.jumlah_kuota || 0}</span>
-            </div>
+        {/* Footer - Quota & Applicants */}
+        <div className="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center text-sm relative z-10">
+          <div className="flex items-center text-gray-600">
+            <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span><strong className="text-gray-900">{job.jumlah_terdaftar || 0}</strong> pendaftar</span>
+          </div>
+          <div className="flex items-center text-gray-600">
+            <span>Kuota: <strong className="text-primary-600">{job.jumlah_kuota || 0}</strong></span>
           </div>
         </div>
       </div>

@@ -207,34 +207,15 @@ const Header = () => {
               {/* Batch Badge */}
               <motion.div
                 variants={itemVariants}
-                className="inline-flex items-center bg-amber-400/20 backdrop-blur-lg rounded-full px-4 py-2 border border-amber-400/30 shadow-lg"
+                className="inline-flex items-center bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 border border-white/20 shadow-lg"
                 whileHover={{ scale: 1.05 }}
               >
-                <span className="w-2 h-2 bg-amber-400 rounded-full mr-2 animate-pulse" />
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
                 <span className="text-sm font-bold text-amber-100">
-                  🔥 Batch 3
+                  Magang Kemnaker Batch 3
                 </span>
               </motion.div>
 
-              {/* Stats Badge */}
-              <motion.div
-                variants={itemVariants}
-                className="inline-flex items-center bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 border border-white/20 shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <motion.span
-                  className="w-2 h-2 bg-green-400 rounded-full mr-2"
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-sm font-medium text-white/90">
-                  {statsLoading
-                    ? "✨ Memuat data..."
-                    : `✨ ${stats ? formatNumber(stats["Jumlah Lowongan"]) : "1.450"
-                    }+ Lowongan Magang Tersedia`}
-                </span>
-              </motion.div>
             </div>
 
             {/* Main Heading - OPTIMIZED FOR ALL SCREENS */}

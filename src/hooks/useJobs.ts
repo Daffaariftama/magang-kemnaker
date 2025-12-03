@@ -48,6 +48,7 @@ interface Filters {
   provinsi: string;
   kota: string;
   perusahaan: string;
+  jenjang: string;
 }
 
 interface Pagination {
@@ -132,6 +133,7 @@ export const useJobs = () => {
   });
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
+  const [availableJenjang, setAvailableJenjang] = useState<string[]>([]);
 
   const [itemsPerPage] = useState(21);
 
@@ -158,6 +160,7 @@ export const useJobs = () => {
         provinsi: "11",
         kota: "",
         perusahaan: "",
+        jenjang: "",
       };
     } catch {
       return {
@@ -166,6 +169,7 @@ export const useJobs = () => {
         provinsi: "11",
         kota: "",
         perusahaan: "",
+        jenjang: "",
       };
     }
   });
@@ -248,14 +252,47 @@ export const useJobs = () => {
     return Array.from(companies).sort();
   };
 
+  // Fungsi untuk extract jenjang unik berdasarkan provinsi yang dipilih
+  const extractJenjangFromJobs = (
+    jobs: Job[],
+    currentFilters: Filters
+  ): string[] => {
+    const jenjangSet = new Set<string>();
+    const currentProvinsiName = getProvinsiName(currentFilters.provinsi);
+
+    jobs.forEach((job) => {
+      // Filter berdasarkan provinsi yang dipilih
+      const matchesProvinsi =
+        job.perusahaan.nama_provinsi &&
+        job.perusahaan.nama_provinsi
+          .toLowerCase()
+          .includes(currentProvinsiName.toLowerCase());
+
+      if (matchesProvinsi && job.jenjang) {
+        try {
+          const jenjangList = typeof job.jenjang === 'string' ? JSON.parse(job.jenjang) : job.jenjang;
+          if (Array.isArray(jenjangList)) {
+            jenjangList.forEach((j: string) => jenjangSet.add(j));
+          }
+        } catch {
+          // Skip invalid jenjang data
+        }
+      }
+    });
+
+    return Array.from(jenjangSet).sort();
+  };
+
   // Update available cities dan companies ketika allJobs berubah
   useEffect(() => {
     if (allJobs.length > 0) {
       const cities = extractCitiesFromJobs(allJobs, filters);
       const companies = extractCompaniesFromJobs(allJobs, filters);
+      const jenjangList = extractJenjangFromJobs(allJobs, filters);
 
       setAvailableCities(cities);
       setAvailableCompanies(companies);
+      setAvailableJenjang(jenjangList);
 
       // Reset kota jika kota yang dipilih tidak ada di list baru
       if (filters.kota && !cities.includes(filters.kota)) {
@@ -265,6 +302,11 @@ export const useJobs = () => {
       // Reset perusahaan jika perusahaan yang dipilih tidak ada di list baru
       if (filters.perusahaan && !companies.includes(filters.perusahaan)) {
         setFilters((prev) => ({ ...prev, perusahaan: "" }));
+      }
+
+      // Reset jenjang jika jenjang yang dipilih tidak ada di list baru
+      if (filters.jenjang && !jenjangList.includes(filters.jenjang)) {
+        setFilters((prev) => ({ ...prev, jenjang: "" }));
       }
     }
   }, [allJobs, filters]);
@@ -520,6 +562,23 @@ export const useJobs = () => {
       );
     }
 
+    // Filter Jenjang
+    if (currentFilters.jenjang) {
+      filtered = filtered.filter((job) => {
+        try {
+          const jenjangList = typeof job.jenjang === 'string' ? JSON.parse(job.jenjang) : job.jenjang;
+          if (Array.isArray(jenjangList)) {
+            return jenjangList.some((j: string) =>
+              j.toLowerCase().includes(currentFilters.jenjang.toLowerCase())
+            );
+          }
+          return false;
+        } catch {
+          return false;
+        }
+      });
+    }
+
     setFilteredJobs(filtered);
   };
 
@@ -565,6 +624,7 @@ export const useJobs = () => {
     filters.jabatan,
     filters.kota,
     filters.perusahaan,
+    filters.jenjang,
   ]);
 
   // Reset pagination setiap kali filter berubah
@@ -626,5 +686,6 @@ export const useJobs = () => {
     manualSync: () => fetchAllJobsInBackground(filters.provinsi, true),
     failedPages,
     retryFailedFetch,
+    availableJenjang,
   };
 };

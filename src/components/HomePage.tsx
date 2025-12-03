@@ -28,6 +28,7 @@ const HomePage = () => {
     manualSync,
     failedPages,
     retryFailedFetch,
+    availableJenjang,
   } = useJobs();
 
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -310,6 +311,7 @@ const HomePage = () => {
             fetchProgress={fetchProgress}
             availableCities={availableCities}
             availableCompanies={availableCompanies}
+            availableJenjang={availableJenjang}
           />
         </section>
 
@@ -511,6 +513,7 @@ const HomePage = () => {
                         provinsi: filters.provinsi,
                         kota: "",
                         perusahaan: "",
+                        jenjang: "",
                       })
                     }
                     className="btn-primary"
