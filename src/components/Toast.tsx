@@ -40,18 +40,18 @@ const Toast: React.FC<ToastProps> = ({
   const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${isExiting ? 'translate-y-20 opacity-0' : 'translate-y-0 opacity-100'}`}>
-      <div className={`${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[300px] max-w-md`}>
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg">
+    <div className={`fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 z-50 transition-all duration-300 ${isExiting ? 'translate-y-20 opacity-0' : 'translate-y-0 opacity-100'}`}>
+      <div className={`${bgColor} text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl flex items-center gap-3 sm:gap-4 w-full sm:min-w-[300px] sm:max-w-md`}>
+        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-base sm:text-lg">
           {icon}
         </div>
-        <div className="flex-1">
-          <p className="font-medium">{message}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-sm sm:text-base break-words">{message}</p>
         </div>
         {showAction && onAction && (
           <button
             onClick={onAction}
-            className="flex-shrink-0 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="flex-shrink-0 bg-white/20 hover:bg-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap"
           >
             {actionLabel}
           </button>

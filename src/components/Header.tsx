@@ -374,7 +374,7 @@ const Header = () => {
             {/* CTA Button - OPTIMIZED FOR MOBILE */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-2"
+              className="flex justify-center px-4 sm:px-2"
             >
               <motion.button
                 onClick={() =>
@@ -382,7 +382,7 @@ const Header = () => {
                     .getElementById("filter-section")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="relative bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-primary-900 px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-primary-900 transition-all duration-300 shadow-lg flex items-center w-full sm:w-auto justify-center overflow-hidden group"
+                className="relative bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-primary-900 px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-bold text-sm sm:text-base md:text-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-primary-900 transition-all duration-300 shadow-lg flex items-center justify-center w-full sm:w-auto max-w-sm sm:max-w-none overflow-hidden group"
                 whileHover={{
                   scale: 1.02,
                 }}
@@ -404,7 +404,7 @@ const Header = () => {
                 />
 
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 mr-2 relative z-10"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 relative z-10 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -417,18 +417,6 @@ const Header = () => {
                   />
                 </svg>
                 <span className="relative z-10 font-bold">Cari Magang Sekarang</span>
-              </motion.button>
-
-              <motion.button
-                onClick={() => navigate('/tersimpan')}
-                className="relative bg-white/10 backdrop-blur-md text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/20 border border-white/20 transition-all duration-300 shadow-lg flex items-center w-full sm:w-auto justify-center group"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-                <span>Tersimpan</span>
               </motion.button>
             </motion.div>
           </div>

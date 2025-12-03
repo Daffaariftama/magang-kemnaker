@@ -8,8 +8,8 @@ const SavedJobsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Sticky Header with proper padding to prevent collision */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-200">
+      {/* Sticky Header with proper z-index to prevent overlap */}
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
         <div className="container mx-auto px-4 py-3 sm:py-4 max-w-7xl">
           <div className="flex items-center space-x-3 sm:space-x-4">
             <button
@@ -22,9 +22,6 @@ const SavedJobsPage = () => {
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 flex items-center truncate">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-red-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
                 <span>Lowongan Tersimpan</span>
               </h1>
               <div className="flex items-center mt-1 text-xs sm:text-sm">
@@ -43,8 +40,8 @@ const SavedJobsPage = () => {
         </div>
       </div>
 
-      {/* Content with proper top padding to prevent collision */}
-      <div className="container mx-auto px-4 pt-6 pb-12 max-w-7xl">
+      {/* Content with proper relative positioning */}
+      <div className="container mx-auto px-4 pt-6 pb-12 max-w-7xl relative z-0">
         {savedJobs.length === 0 ? (
           <div className="text-center py-12 sm:py-16 md:py-20 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
             <div className="relative">

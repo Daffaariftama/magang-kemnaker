@@ -140,10 +140,91 @@ const JobDetail = () => {
 
   if (!job) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Lowongan Tidak Ditemukan</h1>
-          <button onClick={() => navigate('/')} className="text-primary-600 hover:underline">Kembali ke Beranda</button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 p-4">
+        <div className="max-w-2xl w-full">
+          {/* Animated Error Card */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 text-center relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-100 to-blue-100 rounded-full -mr-32 -mt-32 opacity-50"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-100 to-pink-100 rounded-full -ml-24 -mb-24 opacity-50"></div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              {/* Animated 404 Icon */}
+              <div className="mb-6 relative">
+                <div className="text-8xl sm:text-9xl font-bold text-gray-200 select-none">404</div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-6xl sm:text-7xl animate-bounce">🔍</div>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                Lowongan Tidak Ditemukan
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600 mb-2 max-w-md mx-auto">
+                Maaf, lowongan yang Anda cari tidak tersedia atau tautan tidak valid.
+              </p>
+              <p className="text-sm sm:text-base text-gray-500 mb-8 max-w-md mx-auto">
+                Mungkin lowongan sudah ditutup, dihapus, atau API sedang tidak berjalan.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+                <button
+                  onClick={() => navigate('/')}
+                  className="group relative bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3.5 rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 w-full sm:w-auto overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span>Kembali ke Beranda</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => window.history.back()}
+                  className="text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl font-medium text-base border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 w-full sm:w-auto"
+                >
+                  ← Halaman Sebelumnya
+                </button>
+              </div>
+
+              {/* Help Text */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-500">
+                  Butuh bantuan? Coba{" "}
+                  <button
+                    onClick={() => navigate('/')}
+                    className="text-primary-600 hover:text-primary-700 font-semibold underline"
+                  >
+                    cari lowongan lain
+                  </button>
+                  {" "}atau refresh halaman ini.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tips Card */}
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base font-semibold text-blue-900 mb-1">Tips</h3>
+                <p className="text-xs sm:text-sm text-blue-700">
+                  Jika Anda mengakses link dari share, pastikan link masih valid.
+                  Lowongan mungkin sudah ditutup atau API sedang dalam maintenance.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
 import JobCard from "./JobCard";
 import FilterBar from "./FilterBar";
@@ -9,6 +10,7 @@ import Footer from "./Footer";
 import ExportSection from "./ExportSection";
 import { exportService } from "../services/exportService";
 import { getProvinceName } from "../constants/regions";
+import { useSavedJobs } from "../hooks/useSavedJobs";
 
 const HomePage = () => {
   const {
@@ -30,6 +32,9 @@ const HomePage = () => {
     retryFailedFetch,
     availableJenjang,
   } = useJobs();
+
+  const navigate = useNavigate();
+  const { savedJobs } = useSavedJobs();
 
   const mainContentRef = useRef<HTMLDivElement>(null);
   const jobsGridRef = useRef<HTMLDivElement>(null);
@@ -316,21 +321,21 @@ const HomePage = () => {
         </section>
 
         {/* Info Jumlah Lowongan dengan Background Fetch Indicator */}
-        <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-6 shadow-sm border border-gray-200">
           {/* Background Fetch Info */}
           {fetchProgress.isBackgroundFetching && (
-            <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 flex-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-green-700 text-sm font-medium">
+            <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-2 flex-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+                  <span className="text-green-700 text-xs sm:text-sm font-medium">
                     📥 Sedang mengambil data lengkap...
                   </span>
-                  <span className="text-green-600 text-sm">
-                    (Halaman {fetchProgress.current} dari {fetchProgress.total})
+                  <span className="text-green-600 text-xs whitespace-nowrap">
+                    ({fetchProgress.current}/{fetchProgress.total})
                   </span>
                 </div>
-                <div className="text-green-600 text-xs">
+                <div className="text-green-600 text-[10px] sm:text-xs pl-4 sm:pl-0">
                   Data akan terus bertambah
                 </div>
               </div>
@@ -339,25 +344,23 @@ const HomePage = () => {
 
           {/* Last Fetch Time & Manual Sync */}
           {lastFetchTime && (
-            <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-gray-600 text-sm">
-                      Terakhir disinkronkan: <span className="font-medium text-gray-900">{formatLastFetch()}</span>
-                    </span>
-                  </div>
+            <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-gray-600 text-xs sm:text-sm">
+                    Terakhir disinkronkan: <span className="font-medium text-gray-900">{formatLastFetch()}</span>
+                  </span>
                 </div>
                 <button
                   onClick={() => manualSync()}
                   disabled={fetchProgress.isBackgroundFetching}
-                  className="flex items-center space-x-1 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                   title="Sinkronkan ulang data"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>Sync Ulang</span>
@@ -367,37 +370,37 @@ const HomePage = () => {
           )}
 
           {/* Main Info Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
             {/* Results Info */}
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-900 font-semibold text-sm sm:text-base">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+                <span className="text-gray-900 font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap">
                   {pagination.from}-{pagination.to}
                 </span>
               </div>
-              <div className="text-gray-600 text-sm sm:text-base">
+              <div className="text-gray-600 text-xs sm:text-sm md:text-base">
                 dari{" "}
                 <span className="font-semibold text-primary-900">
                   {pagination.total}
                 </span>{" "}
                 lowongan
                 {fetchProgress.isBackgroundFetching && (
-                  <span className="text-green-600 text-xs ml-2">
-                    • Data masih bertambah
+                  <span className="text-green-600 text-[10px] sm:text-xs ml-1 sm:ml-2 whitespace-nowrap">
+                    • Bertambah
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Page Info - Hidden on mobile when filters active */}
+            {/* Page Info - Always visible on desktop, hidden on mobile when filters active */}
             {pagination.total > 0 && (
               <div
-                className={`flex items - center bg - primary - 50 text - primary - 800 px - 3 py - 1.5 rounded - lg text - sm font - medium ${getActiveFiltersText() ? "hidden sm:flex" : "flex"
-                  } `}
+                className={`flex items-center bg-primary-50 text-primary-800 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium w-full sm:w-auto justify-center sm:justify-start ${getActiveFiltersText() ? "hidden sm:flex" : "flex"
+                  }`}
               >
                 <svg
-                  className="w-4 h-4 mr-1.5"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -409,7 +412,7 @@ const HomePage = () => {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                Halaman {pagination.current_page}/{pagination.last_page}
+                <span className="whitespace-nowrap">Halaman {pagination.current_page}/{pagination.last_page}</span>
               </div>
             )}
           </div>
@@ -702,28 +705,62 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Scroll to Filter Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToFilter}
-          className="fixed bottom-4 right-4 z-40 bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-full shadow-lg border border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-          aria-label="Scroll ke filter"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      {/* Floating Action Buttons - Bottom Right */}
+      <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-3">
+        {/* Saved Jobs Button - Only show when there are saved jobs */}
+        {savedJobs.length > 0 && (
+          <button
+            onClick={() => navigate('/tersimpan')}
+            className="relative bg-white hover:bg-gray-50 text-primary-600 p-3 sm:p-3.5 rounded-full shadow-lg border-2 border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
+            aria-label="Lowongan Tersimpan"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
-            />
-          </svg>
-        </button>
-      )}
+            {/* Badge with count */}
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center border-2 border-white shadow-md animate-pulse">
+              {savedJobs.length}
+            </div>
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth={0.5}
+              viewBox="0 0 24 24"
+            >
+              <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            {/* Tooltip */}
+            <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              Lowongan Tersimpan
+            </div>
+          </button>
+        )}
+
+        {/* Scroll to Filter Button */}
+        {showScrollTop && (
+          <button
+            onClick={scrollToFilter}
+            className="bg-primary-600 hover:bg-primary-700 text-white p-3 sm:p-3.5 rounded-full shadow-lg border border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
+            aria-label="Scroll ke filter"
+          >
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+              />
+            </svg>
+            {/* Tooltip */}
+            <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              Ke Filter
+            </div>
+          </button>
+        )}
+      </div>
 
       <div className="container mx-auto px-4 py-6">
         <ExportSection
