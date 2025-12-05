@@ -139,7 +139,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="truncate text-sm">{option}</span>
+                    <span className="text-sm break-words">{option}</span>
                     {value === option && (
                       <svg
                         className="w-4 h-4 text-primary-600 flex-shrink-0"
@@ -223,7 +223,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     onFilterChange({
       programStudi: "",
       jabatan: "",
-      provinsi: "1",
+      provinsi: "ALL",
       kota: "",
       perusahaan: "",
       jenjang: "",
@@ -236,10 +236,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
     filters.kota ||
     filters.perusahaan ||
     filters.jenjang ||
-    filters.provinsi !== "11";
+    filters.provinsi !== "ALL";
 
   // Data provinsi
   const provinsiOptions = [
+    "Semua Provinsi",
     "Aceh",
     "Sumatera Utara",
     "Sumatera Barat",
@@ -281,6 +282,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   ];
 
   const provinsiValues: { [key: string]: string } = {
+    "Semua Provinsi": "ALL",
     Aceh: "11",
     "Sumatera Utara": "12",
     "Sumatera Barat": "13",
@@ -400,7 +402,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Kota/Kabupaten
-           
+
           </label>
           <SearchableDropdown
             value={filters.kota}
@@ -422,7 +424,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             Perusahaan
             {availableCompanies.length > 0 && (
               <span className="text-xs text-gray-500 ml-1">
-                ({availableCompanies.length} perusahaan)
+                ({availableCompanies.length})
               </span>
             )}
           </label>

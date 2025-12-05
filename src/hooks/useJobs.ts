@@ -157,7 +157,7 @@ export const useJobs = () => {
       return savedFilters ? JSON.parse(savedFilters) : {
         programStudi: "",
         jabatan: "",
-        provinsi: "11",
+        provinsi: "91",
         kota: "",
         perusahaan: "",
         jenjang: "",
@@ -166,7 +166,7 @@ export const useJobs = () => {
       return {
         programStudi: "",
         jabatan: "",
-        provinsi: "11",
+        provinsi: "91",
         kota: "",
         perusahaan: "",
         jenjang: "",
@@ -347,7 +347,7 @@ export const useJobs = () => {
   const [failedPages, setFailedPages] = useState<number[]>([]);
 
   // NEW: Fungsi untuk fetch semua data di background dengan IndexedDB caching
-  const fetchAllJobsInBackground = async (provinceCode: string = "11", forceRefresh: boolean = false) => {
+  const fetchAllJobsInBackground = async (provinceCode: string = "ALL", forceRefresh: boolean = false) => {
     cancelCurrentFetch(); // Cancel fetch sebelumnya
 
     const abortController = new AbortController();

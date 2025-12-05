@@ -14,10 +14,16 @@ export const overrideJobData = (job: any) => {
   };
 };
 
-export const fetchJobs = async (page = 1, limit = 20, provinceCode = '32') => {
+export const fetchJobs = async (page = 1, limit = 20, provinceCode = '91') => {
   try {
+    const queryParams = [`order_direction=DESC`, `page=${page}`, `limit=${limit}`];
+
+    if (provinceCode !== 'ALL') {
+      queryParams.push(`kode_provinsi=${provinceCode}`);
+    }
+
     const response = await fetch(
-      `${API_BASE_URL}/vacancies-aktif?order_direction=ASC&page=${page}&limit=${limit}&kode_provinsi=${provinceCode}`
+      `${API_BASE_URL}/vacancies-aktif?${queryParams.join('&')}`
     );
 
     if (!response.ok) {
