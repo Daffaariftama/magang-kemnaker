@@ -5,12 +5,15 @@ import './index.css'
 import { Analytics } from "@vercel/analytics/react"
 
 import { HelmetProvider } from 'react-helmet-async'
+import { JobsProvider } from './contexts/JobsContext'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <App />
-      <Analytics />
+      <JobsProvider>
+        <App />
+        <Analytics />
+      </JobsProvider>
     </HelmetProvider>
   </React.StrictMode>,
 )
