@@ -13,7 +13,7 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({
   message,
   type = 'success',
-  duration = 3000,
+  duration = 1500, // Default duration set to 1.5s as requested
   onClose,
   showAction = false,
   actionLabel = 'Lihat',
@@ -36,22 +36,28 @@ const Toast: React.FC<ToastProps> = ({
 
   if (!isVisible) return null;
 
-  const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+  // Theme-aware gradients matching the app's purple aesthetic
+  const bgClasses = type === 'success'
+    ? 'bg-gradient-to-r from-purple-600 to-indigo-600'
+    : type === 'error'
+      ? 'bg-gradient-to-r from-red-500 to-pink-600'
+      : 'bg-gradient-to-r from-blue-500 to-cyan-600';
+
   const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
 
   return (
-    <div className={`fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 z-50 transition-all duration-300 ${isExiting ? 'translate-y-20 opacity-0' : 'translate-y-0 opacity-100'}`}>
-      <div className={`${bgColor} text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl flex items-center gap-3 sm:gap-4 w-full sm:min-w-[300px] sm:max-w-md`}>
-        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-base sm:text-lg">
+    <div className={`fixed bottom-4 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 z-50 transition-all duration-300 ${isExiting ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+      <div className={`${bgClasses} text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl shadow-lg shadow-purple-900/20 backdrop-blur-sm flex items-center gap-3 w-full sm:w-auto sm:min-w-[320px] max-w-md mx-auto`}>
+        <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm sm:text-base border border-white/20">
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm sm:text-base break-words">{message}</p>
+          <p className="font-medium text-sm sm:text-[15px] leading-snug break-words drop-shadow-sm">{message}</p>
         </div>
         {showAction && onAction && (
           <button
             onClick={onAction}
-            className="flex-shrink-0 bg-white/20 hover:bg-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap"
+            className="flex-shrink-0 bg-white/20 hover:bg-white/30 active:bg-white/40 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap border border-white/10"
           >
             {actionLabel}
           </button>
