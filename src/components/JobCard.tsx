@@ -69,14 +69,14 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
       >
         <div className="relative z-10">
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4 sm:mb-6">
             {/* Company Logo */}
             <div className="flex-shrink-0">
               {job.perusahaan.logo ? (
                 <img
                   src={job.perusahaan.logo}
                   alt={job.perusahaan.nama_perusahaan}
-                  className="w-16 h-16 rounded-2xl object-cover border border-gray-100"
+                  className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl object-contain p-1 border border-gray-100 bg-white"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     const fallback = e.currentTarget.nextElementSibling as HTMLElement;
@@ -84,8 +84,8 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
                   }}
                 />
               ) : null}
-              <div className={`w-16 h-16 rounded-2xl bg-[#F3E8FF] flex items-center justify-center ${job.perusahaan.logo ? 'hidden' : ''}`}>
-                <svg className="w-8 h-8 text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-[#F3E8FF] flex items-center justify-center ${job.perusahaan.logo ? 'hidden' : ''}`}>
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
@@ -93,7 +93,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
             <div className="flex items-center gap-2">
               {job.jumlah_kuota > 0 && (
-                <span className="px-3 py-1 rounded-full bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <span className="px-2 py-1 sm:px-3 rounded-full bg-gray-50 text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {job.jumlah_kuota} Kuota
                 </span>
               )}
