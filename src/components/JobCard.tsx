@@ -30,32 +30,64 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   };
 
   const ProgramStudiModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowProgramStudiModal(false)}>
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="bg-gradient-to-r from-[#8b5cf6] to-indigo-600 p-6 text-white">
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold">Semua Program Studi</h3>
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={() => setShowProgramStudiModal(false)}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 p-5 text-white">
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">Program Studi</h3>
+                <p className="text-purple-200 text-xs">{programStudi.length} program tersedia</p>
+              </div>
+            </div>
             <button
               onClick={() => setShowProgramStudiModal(false)}
-              className="text-white hover:text-gray-200 transition-colors"
+              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-100px)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+        {/* Content */}
+        <div className="p-5 overflow-y-auto max-h-[calc(85vh-180px)] subtle-scrollbar">
+          <div className="space-y-2">
             {programStudi.map((ps: any, index: number) => (
               <div
                 key={index}
-                className="bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-800 px-4 py-3 rounded-lg border border-purple-200 font-medium"
+                className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-white text-gray-700 px-4 py-3 rounded-xl border border-purple-100 hover:border-purple-200 hover:shadow-sm transition-all"
               >
-                {ps.title}
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                  <span className="text-purple-600 text-xs font-bold">{index + 1}</span>
+                </div>
+                <span className="font-medium text-sm">{ps.title}</span>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-100 p-4 bg-gray-50">
+          <button
+            onClick={() => setShowProgramStudiModal(false)}
+            className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-semibold text-sm transition-all"
+          >
+            Tutup
+          </button>
         </div>
       </div>
     </div>
@@ -65,7 +97,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     <>
       <div
         onClick={handleCardClick}
-        className="group relative bg-white rounded-[2rem] p-8 border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300 h-full flex flex-col cursor-pointer"
+        className="group relative bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-md hover:shadow-xl hover:shadow-purple-500/10 hover:border-purple-200 transition-all duration-300 h-full flex flex-col cursor-pointer"
       >
         <div className="relative z-10">
           {/* Header */}

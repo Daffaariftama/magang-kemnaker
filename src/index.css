@@ -2,16 +2,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #f0f7ff;
-  --color-primary-100: #e0f0ff;
-  --color-primary-200: #bae0ff;
-  --color-primary-300: #7cc4ff;
-  --color-primary-400: #36a2ff;
-  --color-primary-500: #0084ff;
-  --color-primary-600: #0066cc;
-  --color-primary-700: #0052a3;
-  --color-primary-800: #003d7a;
-  --color-primary-900: #003399;
+  --color-primary-50: #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7e22ce;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #581c87;
 
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
@@ -136,6 +136,192 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent zoom on input focus in iOS Safari - minimum 16px font-size */
+  @media screen and (max-width: 768px) {
+
+    input,
+    select,
+    textarea,
+    button {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Custom subtle scrollbar */
+  .subtle-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.4);
+    border-radius: 4px;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.6);
+  }
+
+  /* Firefox */
+  .subtle-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+  }
+
+  /* Animated gradient background */
+  @keyframes gradient-shift {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes float-slow {
+
+    0%,
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+
+    50% {
+      transform: translateY(-30px) translateX(20px);
+    }
+  }
+
+  @keyframes float-reverse {
+
+    0%,
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+
+    50% {
+      transform: translateY(30px) translateX(-25px);
+    }
+  }
+
+  @keyframes float-diagonal {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(25px, -20px);
+    }
+  }
+
+  @keyframes pulse-slow {
+
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+      opacity: 0.6;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 10s ease infinite;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 12s ease-in-out infinite;
+  }
+
+  .animate-float-reverse {
+    animation: float-reverse 15s ease-in-out infinite;
+  }
+
+  .animate-float-diagonal {
+    animation: float-diagonal 18s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 10s ease-in-out infinite;
+  }
+
+  /* Marquee animations */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-reverse {
+    0% {
+      transform: translateX(-50%);
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  .animate-marquee-reverse {
+    animation: marquee-reverse 45s linear infinite;
+  }
+
+  /* Wind sway animation for sticky note - Pivot at Tape */
+  @keyframes wind-sway {
+    0% {
+      transform: rotate(-6deg);
+    }
+
+    15% {
+      transform: rotate(2deg);
+      /* Ketiup angin agak kencang ke kanan/atas */
+    }
+
+    40% {
+      transform: rotate(-10deg);
+      /* Balik lagi karena gravitasi + momentum */
+    }
+
+    60% {
+      transform: rotate(-4deg);
+      /* Mulai stabil */
+    }
+
+    80% {
+      transform: rotate(-7deg);
+      /* Goyang sedikit lagi */
+    }
+
+    100% {
+      transform: rotate(-6deg);
+      /* Balik ke posisi awal */
+    }
+  }
+
+  .animate-wind {
+    animation: wind-sway 2.5s ease-in-out infinite;
+    transform-origin: top center;
+    /* Tumpuan di atas (perekat) */
   }
 }
 

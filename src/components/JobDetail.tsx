@@ -23,6 +23,11 @@ const JobDetail = () => {
 
   const isSaved = id ? isJobSaved(id) : false;
 
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   useEffect(() => {
     if (location.state?.job) {
       setJob(location.state.job);
@@ -113,9 +118,6 @@ const JobDetail = () => {
           break;
         case 'already_saved':
           showToastNotification('Lowongan sudah tersimpan', 'info');
-          break;
-        case 'quota_full':
-          showToastNotification('Penyimpanan penuh! Maksimal 10 lowongan', 'error');
           break;
         case 'error':
           showToastNotification('Gagal menyimpan lowongan', 'error');
@@ -462,25 +464,13 @@ const JobDetail = () => {
         </div>
       </div>
 
-      {/* Mobile Sticky Footer - Compact */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-3 py-2.5 md:hidden z-40 flex gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <button onClick={handleSaveToggle} className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-semibold border text-xs transition-colors ${isSaved ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-white text-gray-700 border-gray-300'}`}>
-          <svg className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-          </svg>
-          {isSaved ? 'Tersimpan' : 'Simpan'}
-        </button>
-        <button onClick={() => setShowShareModal(true)} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-semibold border text-xs transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-          </svg>
-          Share
-        </button>
-        <button onClick={handleDaftar} className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold shadow-md shadow-purple-600/20 text-xs">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Mobile Sticky Footer - Only Daftar Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3 md:hidden z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button onClick={handleDaftar} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-purple-600/20 text-sm">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
-          Daftar
+          Daftar Sekarang
         </button>
       </div>
 

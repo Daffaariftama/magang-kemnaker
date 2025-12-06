@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useSavedJobs } from '../hooks/useSavedJobs';
 import JobCard from './JobCard';
 
@@ -7,6 +8,11 @@ import SEO from './SEO';
 const SavedJobsPage = () => {
   const { savedJobs } = useSavedJobs();
   const navigate = useNavigate();
+
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -32,14 +38,8 @@ const SavedJobsPage = () => {
               </h1>
               <div className="flex items-center mt-1 text-xs sm:text-sm">
                 <span className="text-gray-600">
-                  <span className="font-bold text-primary-600">{savedJobs.length}</span> / 10 lowongan
+                  <span className="font-bold text-primary-600">{savedJobs.length}</span> lowongan tersimpan
                 </span>
-                <div className="ml-2 sm:ml-3 bg-gray-200 rounded-full h-1.5 sm:h-2 w-16 sm:w-24 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-purple-600 to-indigo-600 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${(savedJobs.length / 10) * 100}%` }}
-                  ></div>
-                </div>
               </div>
             </div>
           </div>
@@ -67,18 +67,10 @@ const SavedJobsPage = () => {
           </div>
         ) : (
           <>
-            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="mb-4 sm:mb-6">
               <h2 className="text-base sm:text-lg font-semibold text-gray-700">
                 {savedJobs.length} lowongan tersimpan
               </h2>
-              {savedJobs.length >= 8 && (
-                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  Hampir penuh ({10 - savedJobs.length} slot tersisa)
-                </div>
-              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {savedJobs.map((job) => (

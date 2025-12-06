@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type SaveStatus = 'success' | 'already_saved' | 'quota_full' | 'error';
+export type SaveStatus = 'success' | 'already_saved' | 'error';
 
 export const useSavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
@@ -35,10 +35,6 @@ export const useSavedJobs = () => {
 
       if (currentJobs.some((j: any) => j.id_posisi === job.id_posisi)) {
         return 'already_saved';
-      }
-
-      if (currentJobs.length >= 10) {
-        return 'quota_full';
       }
 
       const newJobs = [job, ...currentJobs];

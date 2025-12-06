@@ -4,14 +4,15 @@ const Header = () => {
   const { stats } = useJobs();
 
   return (
-    <header className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 overflow-hidden">
-      {/* Aurora Gradient Blur Effects */}
+    <header className="relative bg-gradient-to-br from-purple-200 via-pink-100 to-indigo-200 overflow-hidden animate-gradient">
+      {/* Aurora Gradient Blur Effects with Float Animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-400/40 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-400/40 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-pink-300/30 rounded-full blur-[130px]"></div>
-        <div className="absolute top-1/4 right-1/3 w-[400px] h-[400px] bg-violet-300/25 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '1s' }}></div>
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-400/50 rounded-full blur-[150px] animate-float-slow"></div>
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-400/50 rounded-full blur-[150px] animate-float-reverse"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-400/40 rounded-full blur-[130px] animate-pulse-slow"></div>
+        <div className="absolute top-1/4 right-1/3 w-[400px] h-[400px] bg-violet-400/35 rounded-full blur-[120px] animate-float-diagonal"></div>
       </div>
+
 
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-28 lg:py-36 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -25,18 +26,37 @@ const Header = () => {
             </span>
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-[1.15] tracking-tight px-4 sm:px-0">
-            <span className="relative inline-block pb-2">
-              Seamless Platform
-              <div className="absolute bottom-0 left-0 right-0 h-4 bg-purple-300/70 rounded-full -z-10"></div>
-            </span>
-            <br />
-            <span className="text-gray-700">for Smarter</span>{" "}
-            <span className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 bg-clip-text text-transparent">
-              Internships
-            </span>
-          </h1>
+          {/* Main Heading with Sticky Note */}
+          <div className="relative inline-block">
+            {/* Batch 3 Sticky Note */}
+            <div className="absolute -top-6 -right-2 sm:-top-8 sm:-right-4 md:-right-8 z-20 pointer-events-none select-none animate-wind">
+              <div className="relative bg-gradient-to-br from-yellow-200 to-yellow-300 px-3 py-2 sm:px-4 sm:py-2.5 shadow-lg transform hover:rotate-0 transition-transform">
+                {/* Tape effect at top */}
+                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 sm:w-10 h-2.5 sm:h-3 bg-yellow-100/80 rounded-sm"></div>
+                {/* Content */}
+                <div className="text-center">
+                  <div className="text-[8px] sm:text-[10px] font-bold text-yellow-800/70 uppercase tracking-wide">Program</div>
+                  <div className="text-sm sm:text-base md:text-lg font-black text-yellow-900 leading-tight whitespace-nowrap">
+                    Batch 3
+                  </div>
+                </div>
+                {/* Paper fold shadow */}
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-gradient-to-br from-transparent via-transparent to-yellow-400/30"></div>
+              </div>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-[1.15] tracking-tight px-4 sm:px-0">
+              <span className="relative inline-block pb-2">
+                Seamless Platform
+                <div className="absolute bottom-0 left-0 right-0 h-4 bg-purple-300/70 rounded-full -z-10"></div>
+              </span>
+              <br />
+              <span className="text-gray-700">for Smarter</span>{" "}
+              <span className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 bg-clip-text text-transparent">
+                Internships
+              </span>
+            </h1>
+          </div>
 
           {/* Description */}
           <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">

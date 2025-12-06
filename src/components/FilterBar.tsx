@@ -17,10 +17,21 @@ interface FilterBarProps {
     current: number;
     total: number;
     isFetchingAll: boolean;
+    isBackgroundFetching?: boolean;
   };
   availableCities: string[];
   availableCompanies: string[];
   availableJenjang: string[];
+  lastFetchTime?: number | null;
+  formatLastFetch?: () => string;
+  manualSync?: () => void;
+  pagination?: {
+    from: number;
+    to: number;
+    total: number;
+    current_page: number;
+    last_page: number;
+  };
 }
 
 // Komponen Searchable Dropdown yang reusable
@@ -174,6 +185,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
   availableCities,
   availableCompanies,
   availableJenjang,
+  lastFetchTime,
+  formatLastFetch,
+  manualSync,
+  pagination,
 }) => {
   const handleProgramStudiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFilterChange({
@@ -201,7 +216,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   const handleKotaChange = (value: string) => {
     onFilterChange({
       ...filters,
-      kota: value === "SEMUA KOTA" ? "" : value, // Jika "Semua" dipilih, set ke string kosong
+      kota: value === "Semua Kota" ? "" : value, // Jika "Semua" dipilih, set ke string kosong
       perusahaan: "", // Reset perusahaan ketika kota berubah
     });
   };
@@ -331,7 +346,56 @@ const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
+    <div className="bg-white rounded-2xl p-4 lg:p-5 shadow-sm border border-gray-200 mb-4 lg:mb-0 lg:h-[calc(100vh-20px)] lg:overflow-y-auto subtle-scrollbar">
+      {/* Info Sync & Jumlah Lowongan - Only visible on desktop */}
+      {pagination && (
+        <div className="hidden lg:block mb-4 pb-4 border-b border-gray-200">
+          {/* Jumlah Lowongan */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+            <span className="text-gray-900 font-semibold text-sm">
+              {pagination.from}-{pagination.to}
+            </span>
+            <span className="text-gray-600 text-sm">
+              dari <span className="font-semibold text-purple-900">{pagination.total}</span> lowongan
+            </span>
+          </div>
+
+          {/* Halaman */}
+          <div className="flex items-center bg-purple-50 text-purple-800 px-2.5 py-1.5 rounded-lg text-xs font-medium mb-3">
+            <svg className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Halaman {pagination.current_page}/{pagination.last_page}</span>
+          </div>
+
+          {/* Sync Info */}
+          {lastFetchTime && formatLastFetch && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-gray-600 text-xs">
+                <svg className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Terakhir: <span className="font-medium text-gray-900">{formatLastFetch()}</span></span>
+              </div>
+              {manualSync && (
+                <button
+                  onClick={manualSync}
+                  disabled={fetchProgress.isBackgroundFetching}
+                  className="flex items-center justify-center gap-1.5 w-full px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-colors text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Sinkronkan ulang data"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Sync Ulang</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Progress Bar untuk Fetching Data */}
       {fetchProgress.isFetchingAll && (
         <div className="mb-4">
@@ -353,7 +417,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
         {/* Filter Program Studi */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -407,8 +471,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <SearchableDropdown
             value={filters.kota}
             onChange={handleKotaChange}
-            options={["SEMUA KOTA", ...availableCities]} // Tambahkan opsi "Semua"
-            placeholder="SEMUA KOTA"
+            options={["Semua Kota", ...availableCities]} // Tambahkan opsi "Semua"
+            placeholder="Semua Kota"
             disabled={loading || availableCities.length === 0}
           />
           {availableCities.length === 0 && !loading && (
