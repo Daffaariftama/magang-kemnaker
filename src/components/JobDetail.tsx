@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useJobs } from '../hooks/useJobs';
 import { useSavedJobs, type SaveStatus } from '../hooks/useSavedJobs';
-import { fetchJobById } from '../services/api';
+import { fetchJobDetailById } from '../services/api';
 import Loading from './Loading';
 import Toast from './Toast';
 import SEO from './SEO';
@@ -11,11 +10,10 @@ const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { getJobDetail, isDataLoaded } = useJobs();
   const { saveJob, removeJob, isJobSaved } = useSavedJobs();
   const [job, setJob] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false); // Track if fetch failed
+  const [fetchError, setFetchError] = useState(false);
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [showToast, setShowToast] = useState(false);
@@ -29,6 +27,7 @@ const JobDetail = () => {
   }, [id]);
 
   useEffect(() => {
+    // 1. Try to use state passed from navigation (fastest)
     if (location.state?.job) {
       setJob(location.state.job);
       setIsLoading(false);
@@ -36,6 +35,7 @@ const JobDetail = () => {
       return;
     }
 
+    // 2. If no state, we MUST fetch from API
     setJob(null);
     setIsLoading(true);
     setFetchError(false);
@@ -43,45 +43,36 @@ const JobDetail = () => {
     if (id) {
       const loadJob = async () => {
         try {
-          if (isDataLoaded()) {
-            const cachedJob = getJobDetail(id);
-            if (cachedJob) {
-              setJob(cachedJob);
-              setIsLoading(false);
-              return;
-            }
-          }
+          console.log(`🔍 Fetching job detail for ID: ${id}`);
 
-          const jobData = await fetchJobById(id);
+          // Use the specific READ endpoint requested by user
+          const jobData = await fetchJobDetailById(id);
+
           if (jobData) {
             setJob(jobData);
+
+            // Auto-update filter context if province differs (optional UX improvement)
             if (jobData.perusahaan?.kode_provinsi) {
               try {
                 const savedFilters = sessionStorage.getItem('magang_filters');
-                const currentFilters = savedFilters ? JSON.parse(savedFilters) : {
-                  programStudi: "",
-                  jabatan: "",
-                  provinsi: "11",
-                  kota: "",
-                  perusahaan: "",
-                  jenjang: "",
-                };
+                const currentFilters = savedFilters ? JSON.parse(savedFilters) : {};
 
                 if (currentFilters.provinsi !== jobData.perusahaan.kode_provinsi) {
-                  currentFilters.provinsi = jobData.perusahaan.kode_provinsi;
-                  sessionStorage.setItem('magang_filters', JSON.stringify(currentFilters));
-                  sessionStorage.setItem('magang_currentPage', '1');
+                  // Only update session storage, nice to have but don't force context update to avoid re-renders of main list
+                  const newFilters = { ...currentFilters, provinsi: jobData.perusahaan.kode_provinsi };
+                  sessionStorage.setItem('magang_filters', JSON.stringify(newFilters));
                 }
               } catch (e) {
                 console.warn('Failed to update filters:', e);
               }
             }
           } else {
-            // Job not found from API
+            // Job not found or API returned empty
+            console.warn('❌ Job detail not found');
             setFetchError(true);
           }
         } catch (e) {
-          console.error('Error loading job:', e);
+          console.error('Error loading job detail:', e);
           setFetchError(true);
         } finally {
           setIsLoading(false);
@@ -89,11 +80,10 @@ const JobDetail = () => {
       };
       loadJob();
     } else {
-      // No ID provided
       setFetchError(true);
       setIsLoading(false);
     }
-  }, [id, location.state, getJobDetail, isDataLoaded]);
+  }, [id, location.state]);
 
   const showToastNotification = (message: string, type: 'success' | 'error' | 'info') => {
     setToastMessage(message);

@@ -65,3 +65,36 @@ export const fetchJobById = async (id: string) => {
     throw error;
   }
 };
+
+// NEW: Fetch specific job detail by ID from read endpoint
+export const fetchJobDetailById = async (id: string) => {
+  try {
+    const response = await fetch(
+      `https://maganghub.kemnaker.go.id/be/v1/api/read/vacancies-aktif/${id}?order_direction=ASC&page=1&limit=10&per_page=10`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch specific job detail');
+    }
+
+    const data = await response.json();
+
+    // The structure might be data.data (array) or just data.data (object) or similar.
+    // Based on typical pagination params in URL, it might return a list or singular wrapped in data.
+    // We will handle both cases defensively.
+
+    if (data.data) {
+      // If it's an array (due to pagination params), take the first one
+      if (Array.isArray(data.data)) {
+        return data.data.length > 0 ? overrideJobData(data.data[0]) : null;
+      }
+      // If it's a single object
+      return overrideJobData(data.data);
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching specific job detail:', error);
+    throw error;
+  }
+};
