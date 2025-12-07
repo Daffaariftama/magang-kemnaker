@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useJobs } from "../hooks/useJobs";
+import { useJobs, type Job } from "../hooks/useJobs";
 import JobCard from "./JobCard";
 import FilterBar from "./FilterBar";
 import Loading from "./Loading";
@@ -660,7 +660,7 @@ const HomePage = () => {
                   className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8"
                 >
                   {jobs.length > 0 ? (
-                    jobs.map((job) => <JobCard key={job.id_posisi} job={job} />)
+                    jobs.map((job: Job) => <JobCard key={job.id_posisi} job={job} />)
                   ) : (
                     <div className="col-span-full text-center py-16 card">
                       <div className="text-6xl mb-4">🔍</div>

@@ -5,7 +5,7 @@ import './index.css'
 import { Analytics } from "@vercel/analytics/react"
 
 import { HelmetProvider } from 'react-helmet-async'
-import { JobsProvider } from './contexts/JobsContext'
+import { JobsProvider } from './contexts/JobsContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

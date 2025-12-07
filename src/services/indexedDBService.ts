@@ -1,11 +1,13 @@
+import LZString from 'lz-string';
+
 const DB_NAME = 'MagangHubCache';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bump version to force schema update
 const STORE_NAME = 'provinceData';
 export const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
 interface CachedProvinceData {
   provinceCode: string;
-  data: any[];
+  data: string; // Compressed string
   timestamp: number;
   totalPages: number;
 }
@@ -33,6 +35,15 @@ class IndexedDBService {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME, { keyPath: 'provinceCode' });
+        } else {
+          // If we want to be safe on schema change (any[] -> string):
+          // Clearing the store is a good idea to avoid type mismatches when reading old data.
+          const transaction = (event.target as IDBOpenDBRequest).transaction;
+          if (transaction) {
+            const store = transaction.objectStore(STORE_NAME);
+            store.clear();
+            console.log("Storage cleared for upgrade to compressed format.");
+          }
         }
       };
     });
@@ -47,20 +58,27 @@ class IndexedDBService {
     return new Promise((resolve, reject) => {
       if (!this.db) return reject('Database not initialized');
 
-      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
+      try {
+        const compressedData = LZString.compressToUTF16(JSON.stringify(data));
 
-      const cacheEntry: CachedProvinceData = {
-        provinceCode,
-        data,
-        timestamp: Date.now(),
-        totalPages,
-      };
+        const transaction = this.db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.put(cacheEntry);
+        const cacheEntry: CachedProvinceData = {
+          provinceCode,
+          data: compressedData,
+          timestamp: Date.now(),
+          totalPages,
+        };
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject('Error saving to cache');
+        const request = store.put(cacheEntry);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject('Error saving to cache');
+      } catch (err) {
+        console.error("Compression error:", err);
+        reject('Error compressing or saving data');
+      }
     });
   }
 
@@ -92,13 +110,27 @@ class IndexedDBService {
           return;
         }
 
-        const isFresh = Date.now() - result.timestamp < CACHE_DURATION_MS;
-        resolve({
-          data: result.data,
-          isFresh,
-          timestamp: result.timestamp,
-          totalPages: result.totalPages,
-        });
+        try {
+          // Decompress
+          const decompressed = result.data ? JSON.parse(LZString.decompressFromUTF16(result.data)) : [];
+          const isFresh = Date.now() - result.timestamp < CACHE_DURATION_MS;
+
+          resolve({
+            data: decompressed,
+            isFresh,
+            timestamp: result.timestamp,
+            totalPages: result.totalPages,
+          });
+        } catch (e) {
+          console.error("Decompression error:", e);
+          // Treat corrupted/incompatible data as cache miss
+          resolve({
+            data: null,
+            isFresh: false,
+            timestamp: null,
+            totalPages: null,
+          });
+        }
       };
 
       request.onerror = () => reject('Error reading from cache');
