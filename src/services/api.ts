@@ -2,7 +2,7 @@ const API_BASE_URL = 'https://maganghub.kemnaker.go.id/be/v1/api/list';
 
 // Helper to override job data with new deadline
 export const overrideJobData = (job: any) => {
-  const NEW_DEADLINE = "2025-12-11";
+  const NEW_DEADLINE = "2025-12-07";
 
   return {
     ...job,

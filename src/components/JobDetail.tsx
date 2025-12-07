@@ -5,6 +5,7 @@ import { fetchJobDetailById } from '../services/api';
 import Loading from './Loading';
 import Toast from './Toast';
 import SEO from './SEO';
+import OnboardingTooltip from './OnboardingTooltip';
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -19,12 +20,29 @@ const JobDetail = () => {
   const [showToast, setShowToast] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
+  // Onboarding Tooltip State
+  const [showTooltip, setShowTooltip] = useState(false);
+
   const isSaved = id ? isJobSaved(id) : false;
 
   // Scroll to top when page loads
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
+
+  // Check for first time user for this feature
+  useEffect(() => {
+    const hasSeenTooltip = localStorage.getItem('hasSeenJobActionsTooltip');
+    // Only show if not seen and not loading
+    if (!hasSeenTooltip && !isLoading) {
+      setShowTooltip(true);
+    }
+  }, [isLoading]);
+
+  const handleCloseTooltip = () => {
+    setShowTooltip(false);
+    localStorage.setItem('hasSeenJobActionsTooltip', 'true');
+  };
 
   useEffect(() => {
     // 1. Try to use state passed from navigation (fastest)
@@ -92,6 +110,9 @@ const JobDetail = () => {
   };
 
   const handleSaveToggle = () => {
+    // If tooltip is open, close it when user actually interacts
+    if (showTooltip) handleCloseTooltip();
+
     if (!job) return;
 
     if (isSaved) {
@@ -117,6 +138,9 @@ const JobDetail = () => {
   };
 
   const handleShare = (platform: string) => {
+    // If tooltip is open, close it when user actually interacts
+    if (showTooltip) handleCloseTooltip();
+
     const url = window.location.href;
     const title = `${job.posisi} - ${job.perusahaan.nama_perusahaan}`;
     const text = `Lihat lowongan magang ${job.posisi} di ${job.perusahaan.nama_perusahaan}, ${job.perusahaan.nama_kabupaten}! 🎯\n\nKuota: ${job.jumlah_kuota} orang\nLokasi: ${job.perusahaan.nama_kabupaten}, ${job.perusahaan.nama_provinsi}\n\nDaftar sekarang di MagangHub Kemnaker:`;
@@ -282,7 +306,7 @@ const JobDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12 font-sans">
+    <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12 font-sans relative">
       <SEO
         title={`${job.nama || 'Lowongan Magang'} di ${job.perusahaan?.name || 'Perusahaan'}`}
         description={`Lowongan magang ${job.nama || 'Posisi'} di ${job.perusahaan?.name || 'Perusahaan'}. Lokasi: ${job.lokasi_kota || 'Kota'}, ${job.lokasi_provinsi || 'Provinsi'}. Daftar sekarang di MagangHub Explorer!`}
@@ -300,7 +324,16 @@ const JobDetail = () => {
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Kembali
           </button>
-          <div className="flex gap-2">
+
+          <div className="flex gap-2 relative">
+            {/* Tooltip Wrapper */}
+            {showTooltip && (
+              <OnboardingTooltip
+                onClose={handleCloseTooltip}
+                className="top-14 right-0 md:right-auto md:left-1/2 md:-translate-x-1/2" // Right aligned on mobile, centered on desktop relative to group
+              />
+            )}
+
             {/* Share Button */}
             <button
               onClick={() => setShowShareModal(true)}
