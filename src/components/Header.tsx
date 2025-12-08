@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useJobs } from "../hooks/useJobs";
 
 const Header = () => {
@@ -28,22 +29,53 @@ const Header = () => {
 
           {/* Main Heading with Sticky Note */}
           <div className="relative inline-block">
-            {/* Batch 3 Sticky Note */}
-            <div className="absolute -top-6 -right-2 sm:-top-8 sm:-right-4 md:-right-8 z-20 pointer-events-none select-none animate-wind">
-              <div className="relative bg-gradient-to-br from-yellow-200 to-yellow-300 px-3 py-2 sm:px-4 sm:py-2.5 shadow-lg transform hover:rotate-0 transition-transform">
+            {/* Batch 3 Sticky Note (Completed) */}
+            <div className="absolute -top-12 -right-16 sm:-top-16 sm:-right-20 md:-right-24 z-10 pointer-events-none select-none opacity-80 rotate-12 scale-90 grayscale">
+              <div className="relative bg-gradient-to-br from-yellow-200 to-yellow-300 px-3 py-2 sm:px-4 sm:py-2.5 shadow-md">
                 {/* Tape effect at top */}
-                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 sm:w-10 h-2.5 sm:h-3 bg-yellow-100/80 rounded-sm"></div>
+                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-2.5 bg-yellow-100/80 rounded-sm rotate-3"></div>
                 {/* Content */}
-                <div className="text-center">
-                  <div className="text-[8px] sm:text-[10px] font-bold text-yellow-800/70 uppercase tracking-wide">Program</div>
-                  <div className="text-sm sm:text-base md:text-lg font-black text-yellow-900 leading-tight whitespace-nowrap">
+                <div className="text-center relative">
+                  <div className="text-[8px] sm:text-[10px] font-bold text-yellow-800/60 uppercase tracking-wide">Program</div>
+                  <div className="text-sm sm:text-base md:text-lg font-black text-yellow-900/60 leading-tight whitespace-nowrap animate-scribble">
                     Batch 3
                   </div>
                 </div>
-                {/* Paper fold shadow */}
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-gradient-to-br from-transparent via-transparent to-yellow-400/30"></div>
               </div>
             </div>
+
+            {/* Batch 4 Sticky Note (Natural Wind Animation with Framer Motion) */}
+            <motion.div
+              className="absolute -top-6 -right-2 sm:-top-8 sm:-right-4 md:-right-8 z-20 pointer-events-none select-none"
+              style={{ originX: 0.5, originY: 0 }} // Pivot at top center (tape location)
+              animate={{
+                rotate: [0, 4, -4, 2, -2, 0], // Natural sway keyframes
+              }}
+              transition={{
+                duration: 4, // Slower duration for more natural feel
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "mirror",
+                delay: 0.5, // Slight offset
+              }}
+            >
+              <div className="relative bg-gradient-to-br from-pink-200 to-rose-300 px-3 py-2 sm:px-4 sm:py-2.5 shadow-lg transform rotate-[-2deg] border-b-2 border-r-2 border-black/5">
+                {/* Tape effect at top */}
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 sm:w-10 h-2.5 sm:h-3 bg-white/40 backdrop-blur-sm rounded-sm shadow-sm rotate-[-1deg] border border-white/20"></div>
+                {/* Content */}
+                <div className="text-center">
+                  <div className="text-[8px] sm:text-[9px] font-bold text-rose-900/70 uppercase tracking-wider mb-0.5">Upcoming</div>
+                  <div className="text-sm sm:text-base md:text-lg font-black text-rose-950 leading-none whitespace-nowrap mb-0.5">
+                    Batch 4
+                  </div>
+                  <div className="text-[8px] sm:text-[10px] font-bold text-rose-800 bg-white/30 rounded-full px-2 py-0.5 inline-block mx-auto">
+                    Coming Soon
+                  </div>
+                </div>
+                {/* Paper fold shadow */}
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
+              </div>
+            </motion.div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-[1.15] tracking-tight px-4 sm:px-0">
               <span className="relative inline-block pb-2">

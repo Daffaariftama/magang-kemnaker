@@ -645,4 +645,33 @@
   .animate-shimmer {
     animation: shimmer 4s ease-in-out infinite;
   }
+
+  @keyframes scribble {
+    0% {
+      width: 0%;
+      opacity: 0.5;
+    }
+
+    100% {
+      width: 100%;
+      opacity: 1;
+    }
+  }
+
+  .animate-scribble {
+    position: relative;
+  }
+
+  .animate-scribble::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 3px;
+    background-color: #ef4444;
+    /* red-500 */
+    transform: translateY(-50%) rotate(-2deg);
+    animation: scribble 0.6s ease-out forwards 1s;
+    /* 1s delay */
+  }
 }
