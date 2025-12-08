@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSavedJobs, type SaveStatus } from '../hooks/useSavedJobs';
-import { fetchJobDetailById } from '../services/api';
 import Loading from './Loading';
 import Toast from './Toast';
 import SEO from './SEO';
 import OnboardingTooltip from './OnboardingTooltip';
+
+import { useJobsContext } from '../contexts/JobsContext';
 
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { saveJob, removeJob, isJobSaved } = useSavedJobs();
+  const { getJobDetail, loading: contextLoading, isDataLoaded } = useJobsContext();
+
   const [job, setJob] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
@@ -34,10 +36,10 @@ const JobDetail = () => {
   useEffect(() => {
     const hasSeenTooltip = localStorage.getItem('hasSeenJobActionsTooltip');
     // Only show if not seen and not loading
-    if (!hasSeenTooltip && !isLoading) {
+    if (!hasSeenTooltip && job) {
       setShowTooltip(true);
     }
-  }, [isLoading]);
+  }, [job]);
 
   const handleCloseTooltip = () => {
     setShowTooltip(false);
@@ -48,60 +50,33 @@ const JobDetail = () => {
     // 1. Try to use state passed from navigation (fastest)
     if (location.state?.job) {
       setJob(location.state.job);
-      setIsLoading(false);
       setFetchError(false);
       return;
     }
 
-    // 2. If no state, we MUST fetch from API
-    setJob(null);
-    setIsLoading(true);
-    setFetchError(false);
-
-    if (id) {
-      const loadJob = async () => {
-        try {
-          console.log(`🔍 Fetching job detail for ID: ${id}`);
-
-          // Use the specific READ endpoint requested by user
-          const jobData = await fetchJobDetailById(id);
-
-          if (jobData) {
-            setJob(jobData);
-
-            // Auto-update filter context if province differs (optional UX improvement)
-            if (jobData.perusahaan?.kode_provinsi) {
-              try {
-                const savedFilters = sessionStorage.getItem('magang_filters');
-                const currentFilters = savedFilters ? JSON.parse(savedFilters) : {};
-
-                if (currentFilters.provinsi !== jobData.perusahaan.kode_provinsi) {
-                  // Only update session storage, nice to have but don't force context update to avoid re-renders of main list
-                  const newFilters = { ...currentFilters, provinsi: jobData.perusahaan.kode_provinsi };
-                  sessionStorage.setItem('magang_filters', JSON.stringify(newFilters));
-                }
-              } catch (e) {
-                console.warn('Failed to update filters:', e);
-              }
-            }
-          } else {
-            // Job not found or API returned empty
-            console.warn('❌ Job detail not found');
-            setFetchError(true);
-          }
-        } catch (e) {
-          console.error('Error loading job detail:', e);
-          setFetchError(true);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      loadJob();
-    } else {
+    if (!id) {
       setFetchError(true);
-      setIsLoading(false);
+      return;
     }
-  }, [id, location.state]);
+
+    // 2. If data is loaded, try to find the job
+    if (isDataLoaded()) {
+      const foundJob = getJobDetail(id);
+      if (foundJob) {
+        setJob(foundJob);
+        setFetchError(false);
+      } else {
+        setFetchError(true);
+      }
+    }
+    // 3. If data is still loading, wait (handled by Loading component below)
+
+  }, [id, location.state, isDataLoaded, getJobDetail]);
+
+
+  // If context is loading and we don't have job yet -> Show loading
+  // NOTE: We check contextLoading BUT we also need to allow "location.state" to bypass it.
+  const isLoading = !job && contextLoading;
 
   const showToastNotification = (message: string, type: 'success' | 'error' | 'info') => {
     setToastMessage(message);

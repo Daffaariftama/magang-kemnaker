@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useRef, type ReactNode } from "react";
-import { fetchJobs, overrideJobData } from "../services/api";
 import { fetchStats } from "../services/statsApi";
 import { indexedDBService } from "../services/indexedDBService";
 import type { Job } from "../hooks/useJobs";
+
+// ... (existing code)
+
+
 
 // Re-export types from useJobs or define them here if moving completely
 interface ProgramStudi {
@@ -341,8 +344,8 @@ export const JobsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // NEW: State untuk tracking halaman yang gagal fetch
   const [failedPages, setFailedPages] = useState<number[]>([]);
 
-  // NEW: Fungsi untuk fetch semua data di background dengan IndexedDB caching
-  const fetchAllJobsInBackground = async (provinceCode: string = "ALL", forceRefresh: boolean = false) => {
+  // NEW: Fungsi untuk fetch semua data di background dari STATIC JSON (via IndexedDB caching)
+  const fetchAllJobsInBackground = async (_provinceCode: string = "ALL", forceRefresh: boolean = false) => {
     cancelCurrentFetch(); // Cancel fetch sebelumnya
 
     const abortController = new AbortController();
@@ -352,14 +355,16 @@ export const JobsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // Check cache first jika bukan force refresh
       if (!forceRefresh) {
-        const cachedData = await indexedDBService.getProvinceData(provinceCode);
+        const cachedData = await indexedDBService.getProvinceData("ALL_STATIC"); // Use fixed key for static data
 
         if (cachedData.data && cachedData.data.length > 0) {
-          console.log(`📦 Loading ${cachedData.data.length} jobs from cache for province ${getProvinsiName(provinceCode)}`);
-          // Apply override to cached data as well
-          setAllJobs(cachedData.data.map(overrideJobData));
+          console.log(`📦 Loading ${cachedData.data.length} jobs from cache (Static JSON)`);
+
+          setAllJobs(cachedData.data);
           setLastFetchTime(cachedData.timestamp);
           setLoading(false);
+          // Trigger filter update explicitly
+          setFilters(prev => ({ ...prev }));
           return;
         }
       }
@@ -370,82 +375,34 @@ export const JobsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isFetchingAll: true
       }));
 
-      // Set loading hanya untuk initial, tidak blocking
       if (allJobs.length === 0) {
         setLoading(true);
       }
 
-      const firstPageData = await fetchJobs(1, 20, provinceCode);
-      const totalPages = firstPageData.meta.pagination.last_page;
+      console.log('🚀 Fetching static jobs.json...');
+      const response = await fetch('/data/jobs.json', { signal: abortController.signal });
 
-      // Check jika fetch dibatalkan
-      if (abortController.signal.aborted) return;
-
-      // Set data halaman pertama langsung
-      setAllJobs(firstPageData.data);
-      setFetchProgress({
-        current: 1,
-        total: totalPages,
-        isFetchingAll: true,
-        isBackgroundFetching: true
-      });
-
-      let allJobsData: Job[] = [...firstPageData.data];
-      const currentFailedPages: number[] = [];
-
-      // Fetch halaman berikutnya di background
-      for (let page = 2; page <= totalPages; page++) {
-        // Check jika fetch dibatalkan sebelum setiap request
-        if (abortController.signal.aborted) return;
-
-        try {
-          const pageData = await fetchJobs(page, 20, provinceCode);
-
-          // Check jika fetch dibatalkan setelah request
-          if (abortController.signal.aborted) return;
-
-          allJobsData = [...allJobsData, ...pageData.data];
-
-          // Update state dengan data baru
-          setAllJobs(allJobsData);
-          setFetchProgress({
-            current: page,
-            total: totalPages,
-            isFetchingAll: true,
-            isBackgroundFetching: true
-          });
-        } catch (err) {
-          console.warn(`⚠️ Gagal fetch halaman ${page}:`, err);
-          currentFailedPages.push(page);
-          setFailedPages(prev => [...prev, page]);
-          // Delay lebih lama jika error (backoff sederhana)
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
-        // Small delay untuk tidak overload server
-        await new Promise((resolve) => setTimeout(resolve, 50));
+      if (!response.ok) {
+        throw new Error(`Failed to load jobs data: ${response.statusText}`);
       }
 
-      // Save to IndexedDB (save apa yang kita punya)
-      await indexedDBService.saveProvinceData(provinceCode, allJobsData, totalPages);
+      const staticJobs: Job[] = await response.json();
+      console.log(`✅ Loaded ${staticJobs.length} jobs from static file`);
+
+      // Save to IndexedDB (Compressed)
+      await indexedDBService.saveProvinceData("ALL_STATIC", staticJobs, 1);
+
+      setAllJobs(staticJobs);
       setLastFetchTime(Date.now());
-
-      if (currentFailedPages.length > 0) {
-        setError(`Gagal mengambil ${currentFailedPages.length} halaman data. Koneksi mungkin tidak stabil.`);
-      } else {
-        setError(null);
-        console.log(`✅ Data provinsi ${getProvinsiName(provinceCode)} selesai di-load dan disimpan: ${allJobsData.length} lowongan`);
-      }
+      setError(null);
 
     } catch (err: any) {
-      // AbortError adalah expected behavior ketika cancel
       if (err.name === 'AbortError') {
-        console.log('Fetch dibatalkan untuk provinsi baru');
+        console.log('Fetch dibatalkan');
         return;
       }
-
-      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
-      console.error("Error fetching jobs:", err);
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan loading data");
+      console.error("Error fetching static jobs:", err);
     } finally {
       if (!abortController.signal.aborted) {
         setFetchProgress({
@@ -462,56 +419,8 @@ export const JobsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // NEW: Fungsi untuk retry halaman yang gagal
   const retryFailedFetch = async () => {
-    if (failedPages.length === 0) return;
-
-    const pagesToRetry = [...failedPages];
-    setFailedPages([]); // Reset sementara
-    setError(null);
-
-    setFetchProgress({
-      current: 0,
-      total: pagesToRetry.length,
-      isBackgroundFetching: true,
-      isFetchingAll: true
-    });
-
-    let currentAllJobs = [...allJobs];
-    const stillFailedPages: number[] = [];
-    let successCount = 0;
-
-    for (const page of pagesToRetry) {
-      try {
-        const pageData = await fetchJobs(page, 20, filters.provinsi);
-        currentAllJobs = [...currentAllJobs, ...pageData.data];
-        setAllJobs(currentAllJobs);
-        successCount++;
-        setFetchProgress(prev => ({
-          ...prev,
-          current: successCount
-        }));
-      } catch (err) {
-        console.warn(`⚠️ Retry gagal untuk halaman ${page}:`, err);
-        stillFailedPages.push(page);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
-
-    setFailedPages(stillFailedPages);
-
-    if (stillFailedPages.length > 0) {
-      setError(`Berhasil memulihkan ${successCount} halaman. Masih ada ${stillFailedPages.length} halaman gagal.`);
-    } else {
-      setError(null);
-      // Update cache dengan data lengkap
-      await indexedDBService.saveProvinceData(filters.provinsi, currentAllJobs, Math.ceil(currentAllJobs.length / 20));
-    }
-
-    setFetchProgress(prev => ({
-      ...prev,
-      isBackgroundFetching: false,
-      isFetchingAll: false
-    }));
+    console.log("Retry logic disabled for static data");
+    // No-op
   };
 
   const applyFilters = (
@@ -611,26 +520,18 @@ export const JobsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Fetch data ketika provinsi berubah (dengan cancel previous dan debounce)
   useEffect(() => {
-    // Reset state immediately when province changes
-    setAllJobs([]);
-    setFilteredJobs([]);
-    setLoading(true);
-    setError(null);
-    setFetchProgress({
-      current: 0,
-      total: 0,
-      isFetchingAll: false,
-      isBackgroundFetching: false,
-    });
+    // Note: We ignore province code for fetching now, as we fetch ALL data from static JSON.
+    // But we might want to trigger a strictly local filter re-apply.
 
-    // Debounce untuk menghindari multiple rapid changes
-    const timeoutId = setTimeout(() => {
-      fetchAllJobsInBackground(filters.provinsi);
-    }, 300); // 300ms debounce
+    // If not loaded, load data.
+    if (allJobs.length === 0) {
+      setLoading(true);
+      fetchAllJobsInBackground();
+    } else {
+      // Just re-apply filters (which includes province)
+      applyFilters();
+    }
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
   }, [filters.provinsi]);
 
   // Apply filters ketika filter berubah
